@@ -12,6 +12,10 @@ interface AssetManifest {
 
 export class ReactWebviewProvider {
     private static readonly viewType = 'giteaReactWebview';
+    private static readonly detailsViewType = 'giteaDetailsWebview';
+    
+    // Track current details panel to reuse/replace it
+    private currentDetailsPanel: vscode.WebviewPanel | undefined;
 
     constructor(
         private readonly extensionUri: vscode.Uri,
@@ -19,8 +23,13 @@ export class ReactWebviewProvider {
     ) {}
 
     public async showPullRequestDetails(pullRequest: PullRequest) {
+        // Dispose existing details panel if it exists
+        if (this.currentDetailsPanel) {
+            this.currentDetailsPanel.dispose();
+        }
+
         const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.viewType,
+            ReactWebviewProvider.detailsViewType,
             `PR #${pullRequest.number}: ${pullRequest.title}`,
             vscode.ViewColumn.One,
             {
@@ -31,6 +40,16 @@ export class ReactWebviewProvider {
                 ]
             }
         );
+
+        // Track this panel as the current details panel
+        this.currentDetailsPanel = panel;
+
+        // Clear the reference when panel is disposed
+        panel.onDidDispose(() => {
+            if (this.currentDetailsPanel === panel) {
+                this.currentDetailsPanel = undefined;
+            }
+        });
 
         panel.webview.html = this.getWebviewContent(panel.webview, 'pullrequest', pullRequest);
 
@@ -52,8 +71,13 @@ export class ReactWebviewProvider {
     }
 
     public async showIssueDetails(issue: Issue) {
+        // Dispose existing details panel if it exists
+        if (this.currentDetailsPanel) {
+            this.currentDetailsPanel.dispose();
+        }
+
         const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.viewType,
+            ReactWebviewProvider.detailsViewType,
             `Issue #${issue.number}: ${issue.title}`,
             vscode.ViewColumn.One,
             {
@@ -64,6 +88,16 @@ export class ReactWebviewProvider {
                 ]
             }
         );
+
+        // Track this panel as the current details panel
+        this.currentDetailsPanel = panel;
+
+        // Clear the reference when panel is disposed
+        panel.onDidDispose(() => {
+            if (this.currentDetailsPanel === panel) {
+                this.currentDetailsPanel = undefined;
+            }
+        });
 
         panel.webview.html = this.getWebviewContent(panel.webview, 'issue', issue);
 
