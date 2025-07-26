@@ -12,3 +12,25 @@ vsc-extension-quickstart.md
 !README.md
 !USAGE.md
 out/test/**
+
+# Node modules
+webview-ui/node_modules/**
+
+# Source files (keep compiled output only)
+webview-ui/src/**
+webview-ui/public/**
+webview-ui/package.json
+webview-ui/package-lock.json
+webview-ui/tsconfig.json
+webview-ui/tailwind.config.js
+webview-ui/postcss.config.js
+webview-ui/.gitignore
+
+# Build tools and config
+eslint.config.mjs
+postcss.config.js
+tailwind.config.js
+CHANGELOG.md
+
+# Keep only the built webview-ui
+!webview-ui/build/**

@@ -10,7 +10,7 @@
   },
   "icon": "gitea-svgrepo-com.png",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.102.0"
   },
   "categories": [
     "Other"
