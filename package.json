@@ -1,0 +1,183 @@
+{
+  "name": "gitea-integration",
+  "displayName": "Gitea Integration",
+  "description": "Fetch and view Gitea pull requests and issues",
+  "version": "1.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*",
+    "onCommand:gitea.listAllPullRequests",
+    "onCommand:gitea.listAllIssues"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitea.viewPullRequests",
+        "title": "View Pull Requests",
+        "category": "Gitea"
+      },
+      {
+        "command": "gitea.viewIssues",
+        "title": "View Issues",
+        "category": "Gitea"
+      },
+      {
+        "command": "gitea.refreshPullRequests",
+        "title": "Refresh Pull Requests",
+        "category": "Gitea",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitea.refreshIssues",
+        "title": "Refresh Issues",
+        "category": "Gitea",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitea.showPullRequestDetails",
+        "title": "Show Pull Request Details",
+        "category": "Gitea"
+      },
+      {
+        "command": "gitea.showIssueDetails",
+        "title": "Show Issue Details",
+        "category": "Gitea"
+      },
+      {
+        "command": "gitea.openPullRequestsWebview",
+        "title": "Open Pull Requests View",
+        "category": "Gitea",
+        "icon": "$(git-pull-request)"
+      },
+      {
+        "command": "gitea.openIssuesWebview",
+        "title": "Open Issues View", 
+        "category": "Gitea",
+        "icon": "$(issues)"
+      },
+      {
+        "command": "gitea.createNewPullRequest",
+        "title": "Create New Pull Request",
+        "category": "Gitea",
+        "icon": "$(add)"
+      },
+      {
+        "command": "gitea.createNewIssue",
+        "title": "Create New Issue",
+        "category": "Gitea",
+        "icon": "$(add)"
+      },
+      {
+        "command": "gitea.listAllPullRequests",
+        "title": "List All Pull Requests",
+        "category": "Gitea",
+        "icon": "$(list-flat)"
+      },
+      {
+        "command": "gitea.listAllIssues",
+        "title": "List All Issues",
+        "category": "Gitea",
+        "icon": "$(list-flat)"
+      }
+    ],
+    "views": {
+      "gitea-panel": [
+        {
+          "id": "giteaPullRequests",
+          "name": "Pull Requests",
+          "when": "giteaPullRequestsVisible"
+        },
+        {
+          "id": "giteaIssues",
+          "name": "Issues",
+          "when": "giteaIssuesVisible"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitea-panel",
+          "title": "Gitea",
+          "icon": "$(git-pull-request)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitea.createNewPullRequest",
+          "when": "view == giteaPullRequests",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.listAllPullRequests",
+          "when": "view == giteaPullRequests",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.refreshPullRequests",
+          "when": "view == giteaPullRequests",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.createNewIssue",
+          "when": "view == giteaIssues",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.listAllIssues",
+          "when": "view == giteaIssues",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.refreshIssues",
+          "when": "view == giteaIssues",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Gitea",
+      "properties": {
+        "gitea.instanceURL": {
+          "type": "string",
+          "description": "Gitea instance URL"
+        },
+        "gitea.owner": {
+          "type": "string",
+          "description": "Repository owner"
+        },
+        "gitea.repo": {
+          "type": "string",
+          "description": "Repository name"
+        },
+        "gitea.token": {
+          "type": "string",
+          "description": "Gitea API token"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "validate": "node validate.js",
+    "install-extension": "./install.sh"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

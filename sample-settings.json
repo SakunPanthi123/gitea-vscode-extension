@@ -1,0 +1,6 @@
+{
+    "gitea.instanceURL": "https://gitea.bright-gps.com",
+    "gitea.owner": "BrightSoftware", 
+    "gitea.repo": "brightschoolv3",
+    "gitea.token": "60cd6b4597aafe268a619cf72618419b2781bd8b"
+}
