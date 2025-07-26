@@ -1,8 +1,8 @@
 {
   "name": "gitea-integration",
   "displayName": "Gitea Integration",
-  "description": "Fetch and view Gitea pull requests and issues",
-  "version": "1.0.4",
+  "description": "A modern React-based VS Code extension to integrate with Gitea repositories, allowing you to view and manage pull requests and issues",
+  "version": "1.0.5",
   "publisher": "SakunPanthi",
   "repository": {
     "type": "git",
@@ -54,40 +54,16 @@
         "category": "Gitea"
       },
       {
-        "command": "gitea.openPullRequestsWebview",
-        "title": "Open Pull Requests View",
-        "category": "Gitea",
-        "icon": "$(git-pull-request)"
-      },
-      {
-        "command": "gitea.openIssuesWebview",
-        "title": "Open Issues View", 
-        "category": "Gitea",
-        "icon": "$(issues)"
-      },
-      {
-        "command": "gitea.createNewPullRequest",
-        "title": "Create New Pull Request",
-        "category": "Gitea",
-        "icon": "$(add)"
-      },
-      {
-        "command": "gitea.createNewIssue",
-        "title": "Create New Issue",
-        "category": "Gitea",
-        "icon": "$(add)"
-      },
-      {
         "command": "gitea.listAllPullRequests",
         "title": "List All Pull Requests",
         "category": "Gitea",
-        "icon": "$(list-flat)"
+        "icon": "$(list-unordered)"
       },
       {
         "command": "gitea.listAllIssues",
-        "title": "List All Issues",
+        "title": "List All Issues", 
         "category": "Gitea",
-        "icon": "$(list-flat)"
+        "icon": "$(list-unordered)"
       }
     ],
     "views": {
@@ -116,7 +92,7 @@
     "menus": {
       "view/title": [
         {
-          "command": "gitea.createNewPullRequest",
+          "command": "gitea.refreshPullRequests",
           "when": "view == giteaPullRequests",
           "group": "navigation"
         },
@@ -126,22 +102,12 @@
           "group": "navigation"
         },
         {
-          "command": "gitea.refreshPullRequests",
-          "when": "view == giteaPullRequests",
-          "group": "navigation"
-        },
-        {
-          "command": "gitea.createNewIssue",
+          "command": "gitea.refreshIssues",  
           "when": "view == giteaIssues",
           "group": "navigation"
         },
         {
           "command": "gitea.listAllIssues",
-          "when": "view == giteaIssues",
-          "group": "navigation"
-        },
-        {
-          "command": "gitea.refreshIssues",
           "when": "view == giteaIssues",
           "group": "navigation"
         }
@@ -171,17 +137,32 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && npm run build-webview",
     "watch": "tsc -watch -p ./",
-    "validate": "node validate.js",
-    "install-extension": "./install.sh"
+    "build-webview": "cd webview-ui && npm run build",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
-    "@types/node": "16.x",
-    "typescript": "^4.9.4"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.19.9",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.25.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "axios": "^1.6.0"
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "axios": "^1.11.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   }
 }

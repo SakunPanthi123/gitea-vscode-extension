@@ -49,8 +49,8 @@ class IssueItem extends vscode.TreeItem {
         this.iconPath = issue.state === 'open' 
             ? new vscode.ThemeIcon('issues', new vscode.ThemeColor('gitDecoration.modifiedResourceForeground'))
             : new vscode.ThemeIcon('issue-closed', new vscode.ThemeColor('gitDecoration.deletedResourceForeground'));
-
-        // Command to show issue details
+        
+        // Make the item clickable
         this.command = {
             command: 'gitea.showIssueDetails',
             title: 'Show Issue Details',
@@ -60,13 +60,7 @@ class IssueItem extends vscode.TreeItem {
 
     private createTooltip(): string {
         const issue = this.issue;
-        const labels = issue.labels ? issue.labels.map(l => l.name).join(', ') : 'None';
-        return `Issue #${issue.number}
-Title: ${issue.title}
-Author: ${issue.user.login}
-State: ${issue.state}
-Labels: ${labels}
-Created: ${new Date(issue.created_at).toLocaleDateString()}
-Updated: ${new Date(issue.updated_at).toLocaleDateString()}`;
+        const labels = issue.labels.map(label => label.name).join(', ');
+        return `#${issue.number}: ${issue.title}\n\nAuthor: ${issue.user.login}\nState: ${issue.state}\nLabels: ${labels || 'None'}\nCreated: ${new Date(issue.created_at).toLocaleString()}\nUpdated: ${new Date(issue.updated_at).toLocaleString()}\n\n${issue.body || 'No description'}`;
     }
 }

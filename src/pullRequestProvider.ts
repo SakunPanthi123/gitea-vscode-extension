@@ -49,8 +49,8 @@ class PullRequestItem extends vscode.TreeItem {
         this.iconPath = pullRequest.state === 'open' 
             ? new vscode.ThemeIcon('git-pull-request', new vscode.ThemeColor('gitDecoration.modifiedResourceForeground'))
             : new vscode.ThemeIcon('git-pull-request', new vscode.ThemeColor('gitDecoration.deletedResourceForeground'));
-
-        // Command to show PR details
+        
+        // Make the item clickable
         this.command = {
             command: 'gitea.showPullRequestDetails',
             title: 'Show Pull Request Details',
@@ -60,12 +60,6 @@ class PullRequestItem extends vscode.TreeItem {
 
     private createTooltip(): string {
         const pr = this.pullRequest;
-        return `Pull Request #${pr.number}
-Title: ${pr.title}
-Author: ${pr.user.login}
-State: ${pr.state}
-Branch: ${pr.head.ref} → ${pr.base.ref}
-Created: ${new Date(pr.created_at).toLocaleDateString()}
-Updated: ${new Date(pr.updated_at).toLocaleDateString()}`;
+        return `#${pr.number}: ${pr.title}\n\nAuthor: ${pr.user.login}\nState: ${pr.state}\nCreated: ${new Date(pr.created_at).toLocaleString()}\nUpdated: ${new Date(pr.updated_at).toLocaleString()}\n\n${pr.body || 'No description'}`;
     }
 }

@@ -1,18 +1,74 @@
-# Gitea VS Code Extension
+# Gitea VS Code Extension (React Version)
 
-A VS Code extension to integrate with Gitea repositories, allowing you to view and manage pull requests and issues directly from VS Code.
+A modern React-based VS Code extension to integrate with Gitea repositories, allowing you to view and manage pull requests and issues directly from VS Code with improved UI and better development experience.
 
 ## Features
 
 - 📋 View all pull requests in a tree view
 - 🐛 View all issues in a tree view
-- 📝 Display pull requests and issues in markdown format through command(markdown renderer extensions will do the extra benefit of displaying it nicely)
+- ⚛️ Modern React-based webview with Tailwind CSS styling
 - 🔄 Refresh data with a click
 - 📖 Detailed view for individual pull requests and issues
+- 🎨 VS Code theme-aware UI components
+- 🚀 Better development experience with hot reloading
+
+## Development
+
+### Prerequisites
+
+- Node.js 16+ and npm
+- VS Code 1.74.0+
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
+
+   ```bash
+   npm install
+   cd webview-ui && npm install && cd ..
+   ```
+
+3. Build the project:
+
+   ```bash
+   npm run compile
+   ```
+
+4. Open in VS Code and press F5 to launch the Extension Host
+
+### Project Structure
+
+```
+├── src/                    # Extension source code
+│   ├── extension.ts        # Main extension entry point
+│   ├── giteaService.ts     # Gitea API service
+│   ├── pullRequestProvider.ts # Tree view provider for PRs
+│   ├── issueProvider.ts    # Tree view provider for issues
+│   └── reactWebviewProvider.ts # React webview provider
+├── webview-ui/             # React application for webviews
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── App.tsx         # Main React app
+│   │   └── index.tsx       # React entry point
+│   ├── public/
+│   └── package.json        # React app dependencies
+└── package.json            # Extension dependencies
+```
+
+### Building
+
+- `npm run compile` - Compile TypeScript and build React app
+- `npm run watch` - Watch mode for development
+- `cd webview-ui && npm run build` - Build React app only
+
+### Testing
+
+Press F5 in VS Code to launch the Extension Development Host. The extension will be available in the new VS Code window.
 
 ## Configuration
 
-Add the following settings to your VS Code User settings or just click on the settings icon on the extension page and fill the text boxes:
+Add the following settings to your VS Code User settings:
 
 ```json
 {
@@ -22,34 +78,39 @@ Add the following settings to your VS Code User settings or just click on the se
   "gitea.token": "[Access token for the user]"
 }
 ```
-***Note: To get the access token, go to your gitea settings and click on Application and then generate token.***
 
-### Commands
+## Commands
 
-- **Gitea: View Pull Requests** - Open a markdown view of all pull requests
-- **Gitea: View Issues** - Open a markdown view of all issues
+- **Gitea: View Pull Requests** - Open a React-based view of all pull requests
+- **Gitea: View Issues** - Open a React-based view of all issues
 
-### Tree Views
+## Tree Views
 
 The extension adds two tree views to the Explorer panel:
 
 1. **Gitea Pull Requests** - Shows a list of all pull requests
 2. **Gitea Issues** - Shows a list of all issues
 
-Click on any item to see detailed information in the Editor area in a separate tab.
+Click on any item to see detailed information in a modern React-based webview.
 
-### Refresh
+## Improvements over Original
 
-Use the refresh button (🔄) in each tree view to fetch the latest data from Gitea.
+- **React-based UI**: Modern, responsive interface built with React and Tailwind CSS
+- **Better Development Experience**: Hot reloading and component-based architecture
+- **VS Code Theme Integration**: Respects VS Code's theme colors and styling
+- **Improved Performance**: Optimized React components with proper state management
+- **Better Error Handling**: More robust error handling and user feedback
+- **Enhanced Styling**: Professional UI with consistent design patterns
 
-## API Endpoints Used
+## Development Workflow
 
-The extension uses the following Gitea API endpoints:
+1. Make changes to the extension code in `src/`
+2. Make changes to the React components in `webview-ui/src/`
+3. Run `npm run compile` to build everything
+4. Press Ctrl+R in the Extension Development Host to reload the extension
+5. Test your changes
 
-- `GET /api/v1/repos/{owner}/{repo}/pulls` - List pull requests
-- `GET /api/v1/repos/{owner}/{repo}/issues` - List issues
-- `GET /api/v1/repos/{owner}/{repo}/pulls/{index}` - Get specific pull request
-- `GET /api/v1/repos/{owner}/{repo}/issues/{index}` - Get specific issue
+For React-only changes, you can run `cd webview-ui && npm start` for development with hot reloading, then build with `npm run build` when ready.
 
 ## License
 
