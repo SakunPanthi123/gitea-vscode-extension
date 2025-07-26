@@ -71,7 +71,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, onMessage }) => {
             onClick={handleRefresh}
             className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors"
           >
-            🔄 Refresh
+           Refresh
           </button>
           <button
             onClick={() => handleOpenExternal(data.html_url)}
