@@ -2,12 +2,13 @@
   "name": "gitea-integration",
   "displayName": "Gitea Integration",
   "description": "Fetch and view Gitea pull requests and issues",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "SakunPanthi",
   "repository": {
     "type": "git",
     "url": "https://github.com/SakunPanthi123/gitea-vscode-extension.git"
   },
+  "icon": "gitea-svgrepo-com.png",
   "engines": {
     "vscode": "^1.74.0"
   },
