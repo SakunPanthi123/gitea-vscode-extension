@@ -16,10 +16,10 @@ Add the following settings to your VS Code settings (either workspace or user se
 
 ```json
 {
-  "gitea.instanceURL": "https://gitea.bright-gps.com",
-  "gitea.owner": "BrightSoftware",
-  "gitea.repo": "brightschoolv3",
-  "gitea.token": "60cd6b4597aafe268a619cf72618419b2781bd8b"
+  "gitea.instanceURL": "https://[private gitea server].[domain]",
+  "gitea.owner": [admin owner not your name],
+  "gitea.repo": [your repo name],
+  "gitea.token": "[your token]"
 }
 ```
 
