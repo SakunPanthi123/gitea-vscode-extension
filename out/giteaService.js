@@ -43,31 +43,31 @@ class GiteaService {
     client;
     config;
     constructor() {
-        this.config = vscode.workspace.getConfiguration('gitea');
+        this.config = vscode.workspace.getConfiguration("gitea");
         this.client = this.createClient();
     }
     createClient() {
-        const instanceURL = this.config.get('instanceURL');
-        const token = this.config.get('token');
+        const instanceURL = this.config.get("instanceURL");
+        const token = this.config.get("token");
         if (!instanceURL) {
-            throw new Error('Gitea instance URL not configured');
+            throw new Error("Gitea instance URL not configured");
         }
         if (!token) {
-            throw new Error('Gitea token not configured');
+            throw new Error("Gitea token not configured");
         }
         return axios_1.default.create({
             baseURL: `${instanceURL}/api/v1`,
             headers: {
-                'Authorization': `token ${token}`,
-                'Content-Type': 'application/json'
-            }
+                Authorization: `token ${token}`,
+                "Content-Type": "application/json",
+            },
         });
     }
     getRepoPath() {
-        const owner = this.config.get('owner');
-        const repo = this.config.get('repo');
+        const owner = this.config.get("owner");
+        const repo = this.config.get("repo");
         if (!owner || !repo) {
-            throw new Error('Repository owner or name not configured');
+            throw new Error("Repository owner or name not configured");
         }
         return `repos/${owner}/${repo}`;
     }
@@ -141,6 +141,15 @@ class GiteaService {
         }
         catch (error) {
             throw new Error(`Failed to fetch pull request timeline: ${error.message}`);
+        }
+    }
+    async getCommitDetails(commitSha) {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/git/commits/${commitSha}`);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to fetch commit details: ${error.message}`);
         }
     }
 }

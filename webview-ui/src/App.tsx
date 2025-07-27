@@ -3,6 +3,7 @@ import PullRequestsList from "./components/PullRequestsList";
 import IssuesList from "./components/IssuesList";
 import PullRequestDetails from "./components/PullRequestDetails";
 import IssueDetails from "./components/IssueDetails";
+import CommitDetails from "./components/CommitDetails";
 import "./App.css";
 
 declare global {
@@ -48,6 +49,8 @@ function App() {
         return <PullRequestDetails data={data} onMessage={sendMessage} />;
       case "issue":
         return <IssueDetails data={data} onMessage={sendMessage} />;
+      case "commit":
+        return <CommitDetails data={data} onMessage={sendMessage} />;
       default:
         return (
           <div className="p-4 text-red-500">Unknown view type: {viewType}</div>

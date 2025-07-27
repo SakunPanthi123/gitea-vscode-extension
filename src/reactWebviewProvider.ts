@@ -1,262 +1,367 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-import { GiteaService, PullRequest, Issue, TimelineEvent } from './giteaService';
+import * as vscode from "vscode";
+import * as path from "path";
+import * as fs from "fs";
+import {
+  GiteaService,
+  PullRequest,
+  Issue,
+  TimelineEvent,
+  CommitDetails,
+} from "./giteaService";
 
 interface AssetManifest {
-    files: {
-        [key: string]: string;
-    };
-    entrypoints: string[];
+  files: {
+    [key: string]: string;
+  };
+  entrypoints: string[];
 }
 
 export class ReactWebviewProvider {
-    private static readonly viewType = 'giteaReactWebview';
-    private static readonly detailsViewType = 'giteaDetailsWebview';
-    
-    // Track current details panel to reuse/replace it
-    private currentDetailsPanel: vscode.WebviewPanel | undefined;
+  private static readonly viewType = "giteaReactWebview";
+  private static readonly detailsViewType = "giteaDetailsWebview";
 
-    constructor(
-        private readonly extensionUri: vscode.Uri,
-        private readonly giteaService: GiteaService
-    ) {}
+  // Track current details panel to reuse/replace it
+  private currentDetailsPanel: vscode.WebviewPanel | undefined;
 
-    public async showPullRequestDetails(pullRequest: PullRequest) {
-        // Dispose existing details panel if it exists
-        if (this.currentDetailsPanel) {
-            this.currentDetailsPanel.dispose();
-        }
+  constructor(
+    private readonly extensionUri: vscode.Uri,
+    private readonly giteaService: GiteaService
+  ) {}
 
-        const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.detailsViewType,
-            `PR #${pullRequest.number}: ${pullRequest.title}`,
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build')
-                ]
-            }
-        );
-
-        // Track this panel as the current details panel
-        this.currentDetailsPanel = panel;
-
-        // Clear the reference when panel is disposed
-        panel.onDidDispose(() => {
-            if (this.currentDetailsPanel === panel) {
-                this.currentDetailsPanel = undefined;
-            }
-        });
-
-        panel.webview.html = this.getWebviewContent(panel.webview, 'pullrequest', pullRequest);
-
-        panel.webview.onDidReceiveMessage(async (message) => {
-            switch (message.type) {
-                case 'openExternal':
-                    vscode.env.openExternal(vscode.Uri.parse(message.url));
-                    break;
-                case 'refresh':
-                    try {
-                        const updatedPR = await this.giteaService.getPullRequest(pullRequest.number);
-                        panel.webview.postMessage({ type: 'updateData', data: updatedPR });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to refresh PR: ${error}`);
-                    }
-                    break;
-                case 'getTimeline':
-                    try {
-                        const timeline = await this.giteaService.getPullRequestTimeline(message.pullRequestNumber);
-                        panel.webview.postMessage({ type: 'timelineData', data: timeline });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to fetch timeline: ${error}`);
-                        panel.webview.postMessage({ type: 'timelineData', data: [] });
-                    }
-                    break;
-            }
-        });
+  public async showPullRequestDetails(pullRequest: PullRequest) {
+    // Dispose existing details panel if it exists
+    if (this.currentDetailsPanel) {
+      this.currentDetailsPanel.dispose();
     }
 
-    public async showIssueDetails(issue: Issue) {
-        // Dispose existing details panel if it exists
-        if (this.currentDetailsPanel) {
-            this.currentDetailsPanel.dispose();
-        }
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.detailsViewType,
+      `PR #${pullRequest.number}: ${pullRequest.title}`,
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
 
-        const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.detailsViewType,
-            `Issue #${issue.number}: ${issue.title}`,
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build')
-                ]
-            }
-        );
+    // Track this panel as the current details panel
+    this.currentDetailsPanel = panel;
 
-        // Track this panel as the current details panel
-        this.currentDetailsPanel = panel;
+    // Clear the reference when panel is disposed
+    panel.onDidDispose(() => {
+      if (this.currentDetailsPanel === panel) {
+        this.currentDetailsPanel = undefined;
+      }
+    });
 
-        // Clear the reference when panel is disposed
-        panel.onDidDispose(() => {
-            if (this.currentDetailsPanel === panel) {
-                this.currentDetailsPanel = undefined;
-            }
-        });
+    panel.webview.html = this.getWebviewContent(
+      panel.webview,
+      "pullrequest",
+      pullRequest
+    );
 
-        panel.webview.html = this.getWebviewContent(panel.webview, 'issue', issue);
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "openExternal":
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+          break;
+        case "refresh":
+          try {
+            const updatedPR = await this.giteaService.getPullRequest(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to refresh PR: ${error}`);
+          }
+          break;
+        case "getTimeline":
+          try {
+            const timeline = await this.giteaService.getPullRequestTimeline(
+              message.pullRequestNumber
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to fetch timeline: ${error}`
+            );
+            panel.webview.postMessage({ type: "timelineData", data: [] });
+          }
+          break;
+        case "getCommitDetails":
+          try {
+            const commitDetails = await this.giteaService.getCommitDetails(
+              message.commitId
+            );
+            panel.webview.postMessage({
+              type: "commitDetails",
+              commitId: message.commitId,
+              data: commitDetails,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to fetch commit details: ${error}`
+            );
+          }
+          break;
+        case "showCommitDetails":
+          this.showCommitDetails(message.data);
+          break;
+      }
+    });
+  }
 
-        panel.webview.onDidReceiveMessage(async (message) => {
-            switch (message.type) {
-                case 'openExternal':
-                    vscode.env.openExternal(vscode.Uri.parse(message.url));
-                    break;
-                case 'refresh':
-                    try {
-                        const updatedIssue = await this.giteaService.getIssue(issue.number);
-                        panel.webview.postMessage({ type: 'updateData', data: updatedIssue });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to refresh issue: ${error}`);
-                    }
-                    break;
-                case 'getTimeline':
-                    try {
-                        const timeline = await this.giteaService.getIssueTimeline(message.issueNumber);
-                        panel.webview.postMessage({ type: 'timelineData', data: timeline });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to fetch timeline: ${error}`);
-                        panel.webview.postMessage({ type: 'timelineData', data: [] });
-                    }
-                    break;
-            }
-        });
+  public async showIssueDetails(issue: Issue) {
+    // Dispose existing details panel if it exists
+    if (this.currentDetailsPanel) {
+      this.currentDetailsPanel.dispose();
     }
 
-    public async showPullRequestsList() {
-        const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.viewType,
-            'Gitea Pull Requests',
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build')
-                ]
-            }
-        );
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.detailsViewType,
+      `Issue #${issue.number}: ${issue.title}`,
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
 
-        try {
+    // Track this panel as the current details panel
+    this.currentDetailsPanel = panel;
+
+    // Clear the reference when panel is disposed
+    panel.onDidDispose(() => {
+      if (this.currentDetailsPanel === panel) {
+        this.currentDetailsPanel = undefined;
+      }
+    });
+
+    panel.webview.html = this.getWebviewContent(panel.webview, "issue", issue);
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "openExternal":
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+          break;
+        case "refresh":
+          try {
+            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to refresh issue: ${error}`);
+          }
+          break;
+        case "getTimeline":
+          try {
+            const timeline = await this.giteaService.getIssueTimeline(
+              message.issueNumber
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to fetch timeline: ${error}`
+            );
+            panel.webview.postMessage({ type: "timelineData", data: [] });
+          }
+          break;
+        case "getCommitDetails":
+          try {
+            const commitDetails = await this.giteaService.getCommitDetails(
+              message.commitId
+            );
+            panel.webview.postMessage({
+              type: "commitDetails",
+              commitId: message.commitId,
+              data: commitDetails,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to fetch commit details: ${error}`
+            );
+          }
+          break;
+        case "showCommitDetails":
+          this.showCommitDetails(message.data);
+          break;
+      }
+    });
+  }
+
+  public async showPullRequestsList() {
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.viewType,
+      "Gitea Pull Requests",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
+
+    try {
+      const pullRequests = await this.giteaService.getPullRequests();
+      panel.webview.html = this.getWebviewContent(
+        panel.webview,
+        "pullrequests",
+        pullRequests
+      );
+    } catch (error) {
+      vscode.window.showErrorMessage(`Failed to load pull requests: ${error}`);
+      panel.webview.html = this.getErrorContent(
+        panel.webview,
+        "Failed to load pull requests"
+      );
+    }
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "openExternal":
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+          break;
+        case "showDetails":
+          this.showPullRequestDetails(message.data);
+          break;
+        case "refresh":
+          try {
             const pullRequests = await this.giteaService.getPullRequests();
-            panel.webview.html = this.getWebviewContent(panel.webview, 'pullrequests', pullRequests);
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to load pull requests: ${error}`);
-            panel.webview.html = this.getErrorContent(panel.webview, 'Failed to load pull requests');
-        }
+            panel.webview.postMessage({
+              type: "updateData",
+              data: pullRequests,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to refresh pull requests: ${error}`
+            );
+          }
+          break;
+      }
+    });
+  }
 
-        panel.webview.onDidReceiveMessage(async (message) => {
-            switch (message.type) {
-                case 'openExternal':
-                    vscode.env.openExternal(vscode.Uri.parse(message.url));
-                    break;
-                case 'showDetails':
-                    this.showPullRequestDetails(message.data);
-                    break;
-                case 'refresh':
-                    try {
-                        const pullRequests = await this.giteaService.getPullRequests();
-                        panel.webview.postMessage({ type: 'updateData', data: pullRequests });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to refresh pull requests: ${error}`);
-                    }
-                    break;
-            }
-        });
+  public async showIssuesList() {
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.viewType,
+      "Gitea Issues",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
+
+    try {
+      const issues = await this.giteaService.getIssues();
+      panel.webview.html = this.getWebviewContent(
+        panel.webview,
+        "issues",
+        issues
+      );
+    } catch (error) {
+      vscode.window.showErrorMessage(`Failed to load issues: ${error}`);
+      panel.webview.html = this.getErrorContent(
+        panel.webview,
+        "Failed to load issues"
+      );
     }
 
-    public async showIssuesList() {
-        const panel = vscode.window.createWebviewPanel(
-            ReactWebviewProvider.viewType,
-            'Gitea Issues',
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build')
-                ]
-            }
-        );
-
-        try {
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "openExternal":
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+          break;
+        case "showDetails":
+          this.showIssueDetails(message.data);
+          break;
+        case "refresh":
+          try {
             const issues = await this.giteaService.getIssues();
-            panel.webview.html = this.getWebviewContent(panel.webview, 'issues', issues);
-        } catch (error) {
-            vscode.window.showErrorMessage(`Failed to load issues: ${error}`);
-            panel.webview.html = this.getErrorContent(panel.webview, 'Failed to load issues');
-        }
+            panel.webview.postMessage({ type: "updateData", data: issues });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to refresh issues: ${error}`
+            );
+          }
+          break;
+      }
+    });
+  }
 
-        panel.webview.onDidReceiveMessage(async (message) => {
-            switch (message.type) {
-                case 'openExternal':
-                    vscode.env.openExternal(vscode.Uri.parse(message.url));
-                    break;
-                case 'showDetails':
-                    this.showIssueDetails(message.data);
-                    break;
-                case 'refresh':
-                    try {
-                        const issues = await this.giteaService.getIssues();
-                        panel.webview.postMessage({ type: 'updateData', data: issues });
-                    } catch (error) {
-                        vscode.window.showErrorMessage(`Failed to refresh issues: ${error}`);
-                    }
-                    break;
-            }
-        });
+  private getWebviewContent(
+    webview: vscode.Webview,
+    viewType: string,
+    data: any
+  ): string {
+    // Read the asset manifest to get the correct file names
+    const manifestPath = vscode.Uri.joinPath(
+      this.extensionUri,
+      "webview-ui",
+      "build",
+      "asset-manifest.json"
+    );
+
+    let manifest: AssetManifest;
+    try {
+      const manifestContent = fs.readFileSync(manifestPath.fsPath, "utf8");
+      manifest = JSON.parse(manifestContent);
+    } catch (error) {
+      console.error("Failed to read asset manifest:", error);
+      return this.getErrorContent(webview, "Failed to load webview assets");
     }
 
-    private getWebviewContent(webview: vscode.Webview, viewType: string, data: any): string {
-        // Read the asset manifest to get the correct file names
-        const manifestPath = vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build', 'asset-manifest.json');
-        
-        let manifest: AssetManifest;
-        try {
-            const manifestContent = fs.readFileSync(manifestPath.fsPath, 'utf8');
-            manifest = JSON.parse(manifestContent);
-        } catch (error) {
-            console.error('Failed to read asset manifest:', error);
-            return this.getErrorContent(webview, 'Failed to load webview assets');
-        }
+    // Get the main JS and CSS files from the manifest
+    const mainJs = manifest.files["main.js"];
+    const mainCss = manifest.files["main.css"];
 
-        // Get the main JS and CSS files from the manifest
-        const mainJs = manifest.files['main.js'];
-        const mainCss = manifest.files['main.css'];
+    if (!mainJs || !mainCss) {
+      return this.getErrorContent(webview, "Main assets not found in manifest");
+    }
 
-        if (!mainJs || !mainCss) {
-            return this.getErrorContent(webview, 'Main assets not found in manifest');
-        }
+    // Create webview URIs for the assets
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.extensionUri,
+        "webview-ui",
+        "build",
+        mainJs.replace(/^\//, "")
+      )
+    );
+    const cssUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.extensionUri,
+        "webview-ui",
+        "build",
+        mainCss.replace(/^\//, "")
+      )
+    );
 
-        // Create webview URIs for the assets
-        const scriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build', mainJs.replace(/^\//, ''))
-        );
-        const cssUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this.extensionUri, 'webview-ui', 'build', mainCss.replace(/^\//, ''))
-        );
+    // Generate nonce for security
+    const nonce = this.getNonce();
 
-        // Generate nonce for security
-        const nonce = this.getNonce();
-
-        return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https:; connect-src 'none';">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
+                  webview.cspSource
+                } 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${
+      webview.cspSource
+    } https:; connect-src 'none';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Gitea ${viewType}</title>
                 <link href="${cssUri}" rel="stylesheet">
@@ -277,21 +382,25 @@ export class ReactWebviewProvider {
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
             </html>`;
-    }
+  }
 
-    private getNonce(): string {
-        let text = '';
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 32; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
+  private getNonce(): string {
+    let text = "";
+    const possible =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
+    return text;
+  }
 
-    private getErrorContent(webview: vscode.Webview, errorMessage: string): string {
-        const nonce = this.getNonce();
-        
-        return `<!DOCTYPE html>
+  private getErrorContent(
+    webview: vscode.Webview,
+    errorMessage: string
+  ): string {
+    const nonce = this.getNonce();
+
+    return `<!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
@@ -323,5 +432,35 @@ export class ReactWebviewProvider {
                 </div>
             </body>
             </html>`;
-    }
+  }
+
+  public async showCommitDetails(commitDetails: CommitDetails) {
+    // Create a new panel without disposing the current one
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.detailsViewType,
+      `Commit ${commitDetails.sha.substring(0, 8)}`,
+      vscode.ViewColumn.Beside
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
+
+    panel.webview.html = this.getWebviewContent(
+      panel.webview,
+      "commit",
+      commitDetails
+    );
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "openExternal":
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+          break;
+      }
+    });
+  }
 }

@@ -1,23 +1,5 @@
 import React from "react";
-
-interface Issue {
-  id: number;
-  number: number;
-  title: string;
-  body: string;
-  state: string;
-  user: {
-    login: string;
-    avatar_url: string;
-  };
-  labels: Array<{
-    name: string;
-    color: string;
-  }>;
-  created_at: string;
-  updated_at: string;
-  html_url: string;
-}
+import { Issue } from "./_types";
 
 interface Props {
   data: Issue[];

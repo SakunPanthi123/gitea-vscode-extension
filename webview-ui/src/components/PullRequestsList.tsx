@@ -1,26 +1,5 @@
 import React from "react";
-
-interface PullRequest {
-  id: number;
-  number: number;
-  title: string;
-  body: string;
-  state: string;
-  user: {
-    login: string;
-    avatar_url: string;
-  };
-  head: {
-    ref: string;
-  };
-  base: {
-    ref: string;
-  };
-  created_at: string;
-  updated_at: string;
-  html_url: string;
-  mergeable: boolean;
-}
+import { PullRequest } from "./_types";
 
 interface Props {
   data: PullRequest[];
@@ -52,7 +31,7 @@ const PullRequestsList: React.FC<Props> = ({ data, onMessage }) => {
           onClick={handleRefresh}
           className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors"
         >
-         Refresh
+          Refresh
         </button>
       </div>
 

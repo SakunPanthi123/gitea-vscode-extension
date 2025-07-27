@@ -1,76 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
-
-interface PullRequest {
-  id: number;
-  number: number;
-  title: string;
-  body: string;
-  state: string;
-  user: {
-    login: string;
-    avatar_url: string;
-  };
-  head: {
-    ref: string;
-  };
-  base: {
-    ref: string;
-  };
-  created_at: string;
-  updated_at: string;
-  html_url: string;
-  mergeable: boolean;
-}
-
-interface TimelineEvent {
-  id: number;
-  type: string;
-  html_url: string;
-  pull_request_url: string;
-  issue_url: string;
-  user: {
-    id: number;
-    login: string;
-    login_name: string;
-    full_name: string;
-    email: string;
-    avatar_url: string;
-    html_url: string;
-    username: string;
-  };
-  body: string;
-  created_at: string;
-  updated_at: string;
-  old_project_id: number;
-  project_id: number;
-  old_milestone: any;
-  milestone: any;
-  tracked_time: any;
-  old_title: string;
-  new_title: string;
-  old_ref: string;
-  new_ref: string;
-  ref_issue: any;
-  ref_comment: any;
-  ref_action: string;
-  ref_commit_sha: string;
-  review_id: number;
-  label: {
-    id: number;
-    name: string;
-    exclusive: boolean;
-    is_archived: boolean;
-    color: string;
-    description: string;
-    url: string;
-  } | null;
-  assignee: any;
-  assignee_team: any;
-  removed_assignee: boolean;
-  resolve_doer: any;
-  dependent_issue: any;
-}
+import { PullRequest, TimelineEvent } from "./_types";
 
 interface Props {
   data: PullRequest;
@@ -219,7 +149,11 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="space-y-4">
           <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>
-            <Timeline events={timelineData} isLoading={isLoadingTimeline} />
+            <Timeline
+              events={timelineData}
+              isLoading={isLoadingTimeline}
+              onMessage={onMessage}
+            />
           </div>
         </div>
       </div>

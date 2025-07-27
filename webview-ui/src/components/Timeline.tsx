@@ -1,60 +1,92 @@
-import React from "react";
-
-interface TimelineEvent {
-  id: number;
-  type: string;
-  html_url: string;
-  pull_request_url: string;
-  issue_url: string;
-  user: {
-    id: number;
-    login: string;
-    login_name: string;
-    full_name: string;
-    email: string;
-    avatar_url: string;
-    html_url: string;
-    username: string;
-  };
-  body: string;
-  created_at: string;
-  updated_at: string;
-  old_project_id: number;
-  project_id: number;
-  old_milestone: any;
-  milestone: any;
-  tracked_time: any;
-  old_title: string;
-  new_title: string;
-  old_ref: string;
-  new_ref: string;
-  ref_issue: any;
-  ref_comment: any;
-  ref_action: string;
-  ref_commit_sha: string;
-  review_id: number;
-  label: {
-    id: number;
-    name: string;
-    exclusive: boolean;
-    is_archived: boolean;
-    color: string;
-    description: string;
-    url: string;
-  } | null;
-  assignee: any;
-  assignee_team: any;
-  removed_assignee: boolean;
-  resolve_doer: any;
-  dependent_issue: any;
-}
+import React, { useState, useEffect, useCallback } from "react";
+import { TimelineEvent, CommitDetails } from "./_types";
 
 interface Props {
   events: TimelineEvent[];
   isLoading?: boolean;
+  onMessage?: (type: string, payload?: any) => void;
 }
 
-const Timeline: React.FC<Props> = ({ events, isLoading }) => {
+const Timeline: React.FC<Props> = ({ events, isLoading, onMessage }) => {
+  const [commitDetails, setCommitDetails] = useState<
+    Record<string, CommitDetails>
+  >({});
+  const [loadingCommits, setLoadingCommits] = useState<Set<string>>(new Set());
+
+  // Extract commit IDs from pull_push events
+  const extractCommitIds = (event: TimelineEvent): string[] => {
+    if (event.type !== "pull_push") return [];
+    try {
+      const pushData = JSON.parse(event.body);
+      return pushData.commit_ids || [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Fetch commit details for a specific commit
+  const fetchCommitDetails = useCallback(
+    async (commitId: string) => {
+      if (commitDetails[commitId] || loadingCommits.has(commitId)) return;
+
+      setLoadingCommits((prev) => {
+        const newSet = new Set(Array.from(prev));
+        newSet.add(commitId);
+        return newSet;
+      });
+
+      if (onMessage) {
+        onMessage("getCommitDetails", { commitId });
+      }
+    },
+    [commitDetails, loadingCommits, onMessage]
+  );
+
+  // Listen for commit details responses
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const message = event.data;
+      if (message.type === "commitDetails") {
+        const { commitId, data } = message;
+        setCommitDetails((prev) => ({
+          ...prev,
+          [commitId]: data,
+        }));
+        setLoadingCommits((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(commitId);
+          return newSet;
+        });
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  // Auto-fetch commit details when events change
+  useEffect(() => {
+    if (!onMessage || !events) return;
+
+    const commitIds: string[] = [];
+    events.forEach((event) => {
+      if (event.type === "pull_push") {
+        const ids = extractCommitIds(event);
+        commitIds.push(...ids);
+      }
+    });
+
+    // Fetch details for all commits
+    commitIds.forEach((commitId) => {
+      fetchCommitDetails(commitId);
+    });
+  }, [events, onMessage, fetchCommitDetails]);
+
+  const handleShowCommitDetails = (commitId: string) => {
+    if (onMessage && commitDetails[commitId]) {
+      onMessage("showCommitDetails", { data: commitDetails[commitId] });
+    }
+  };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -149,6 +181,111 @@ const Timeline: React.FC<Props> = ({ events, isLoading }) => {
     return event.type === "comment" && event.body && event.body.trim() !== "";
   };
 
+  const renderCommitDetails = (event: TimelineEvent) => {
+    if (event.type !== "pull_push") return null;
+
+    const commitIds = extractCommitIds(event);
+    if (commitIds.length === 0) return null;
+
+    return (
+      <div className="mt-3 space-y-2">
+        {commitIds.map((commitId) => {
+          const details = commitDetails[commitId];
+          const isLoading = loadingCommits.has(commitId);
+
+          return (
+            <div
+              key={commitId}
+              className="bg-gray-50 bg-opacity-5 rounded border border-gray-300 border-opacity-20 p-3"
+            >
+              {isLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-3/4 mb-2"></div>
+                  <div className="h-2 bg-gray-300 bg-opacity-20 rounded w-1/2"></div>
+                </div>
+              ) : details ? (
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-gray-200 mb-1">
+                        {details.commit.message.split("\n")[0]}
+                      </div>
+                      <div className="text-xs text-gray-400 flex items-center gap-3">
+                        <span>
+                          <code className="bg-gray-600 bg-opacity-30 px-1 rounded">
+                            {commitId.substring(0, 8)}
+                          </code>
+                        </span>
+                        <span>
+                          📄 {details.files.length} file
+                          {details.files.length !== 1 ? "s" : ""}
+                        </span>
+                        <span className="text-green-400">
+                          +{details.stats.additions}
+                        </span>
+                        <span className="text-red-400">
+                          -{details.stats.deletions}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleShowCommitDetails(commitId)}
+                      className="px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors text-xs"
+                    >
+                      View Details
+                    </button>
+                  </div>
+
+                  {details.files.length <= 3 ? (
+                    <div className="space-y-1">
+                      {details.files.map((file, index) => (
+                        <div
+                          key={index}
+                          className="text-xs text-gray-400 font-mono"
+                        >
+                          <span
+                            className={`inline-block w-1 mr-2 ${
+                              file.status === "added"
+                                ? "text-green-400"
+                                : file.status === "modified"
+                                ? "text-yellow-400"
+                                : file.status === "deleted"
+                                ? "text-red-400"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {file.status === "added"
+                              ? "+"
+                              : file.status === "modified"
+                              ? "~"
+                              : file.status === "deleted"
+                              ? "-"
+                              : "•"}
+                          </span>
+                          {file.filename}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-400">
+                      Click "View Details" to see all {details.files.length}{" "}
+                      changed files
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-pulse">
+                  <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-3/4 mb-2"></div>
+                  <div className="h-2 bg-gray-300 bg-opacity-20 rounded w-1/2"></div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -198,11 +335,11 @@ const Timeline: React.FC<Props> = ({ events, isLoading }) => {
                   <span className="font-medium">{event.user.login}</span>
                   <div className="flex items-center gap-2">
                     <span className="text-gray-400">
-                    {getEventDescription(event)}
-                  </span>
-                  <span className="text-gray-500 text-xs whitespace-nowrap">
-                    {formatDate(event.created_at)}
-                  </span>
+                      {getEventDescription(event)}
+                    </span>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">
+                      {formatDate(event.created_at)}
+                    </span>
                   </div>
                 </div>
 
@@ -219,6 +356,8 @@ const Timeline: React.FC<Props> = ({ events, isLoading }) => {
                     </span>
                   </div>
                 )}
+
+                {renderCommitDetails(event)}
 
                 {shouldShowBody(event) && (
                   <div className="mt-2 p-3 bg-gray-50 bg-opacity-5 rounded border-l-2 border-gray-300 border-opacity-30">
