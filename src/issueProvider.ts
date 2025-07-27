@@ -5,9 +5,13 @@ export class IssueProvider implements vscode.TreeDataProvider<IssueItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<IssueItem | undefined | null | void> = new vscode.EventEmitter<IssueItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<IssueItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-    private issues: Issue[] = [];
+    private issues: Issue[];
 
-    constructor(private giteaService: GiteaService) {
+    constructor(private readonly giteaService: GiteaService) {
+        this.issues = [];
+    }
+
+    async initialize() {
         this.loadIssues();
     }
 

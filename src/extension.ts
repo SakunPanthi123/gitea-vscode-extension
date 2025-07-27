@@ -8,10 +8,16 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Gitea Integration (React) extension is now active!');
 
     const giteaService = new GiteaService();
-    
-    // Create providers
     const pullRequestProvider = new PullRequestProvider(giteaService);
     const issueProvider = new IssueProvider(giteaService);
+    
+    // Initialize providers
+    (async () =>{
+        await Promise.all([
+            pullRequestProvider.initialize(),
+            issueProvider.initialize()
+        ]);
+    })();
     const reactWebviewProvider = new ReactWebviewProvider(context.extensionUri, giteaService);
 
     // Register tree data providers

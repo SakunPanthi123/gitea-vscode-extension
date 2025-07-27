@@ -5,9 +5,13 @@ export class PullRequestProvider implements vscode.TreeDataProvider<PullRequestI
     private _onDidChangeTreeData: vscode.EventEmitter<PullRequestItem | undefined | null | void> = new vscode.EventEmitter<PullRequestItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<PullRequestItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-    private pullRequests: PullRequest[] = [];
+    private pullRequests: PullRequest[];
 
-    constructor(private giteaService: GiteaService) {
+    constructor(private readonly giteaService: GiteaService) {
+        this.pullRequests = [];
+    }
+
+    async initialize() {
         this.loadPullRequests();
     }
 
