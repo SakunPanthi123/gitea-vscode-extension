@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { GiteaService, Issue } from './giteaService';
 
+type IssueTreeData = IssueItem | undefined | null | void;
+
 export class IssueProvider implements vscode.TreeDataProvider<IssueItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<IssueItem | undefined | null | void> = new vscode.EventEmitter<IssueItem | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<IssueItem | undefined | null | void> = this._onDidChangeTreeData.event;
+    private readonly _onDidChangeTreeData: vscode.EventEmitter<IssueTreeData> = new vscode.EventEmitter<IssueTreeData>();
+    readonly onDidChangeTreeData: vscode.Event<IssueTreeData> = this._onDidChangeTreeData.event;
 
     private issues: Issue[];
 

@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { GiteaService, PullRequest } from './giteaService';
 
+type PullRequestTreeData = PullRequestItem | undefined | null | void;
+
 export class PullRequestProvider implements vscode.TreeDataProvider<PullRequestItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<PullRequestItem | undefined | null | void> = new vscode.EventEmitter<PullRequestItem | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<PullRequestItem | undefined | null | void> = this._onDidChangeTreeData.event;
+    private readonly _onDidChangeTreeData: vscode.EventEmitter<PullRequestTreeData> = new vscode.EventEmitter<PullRequestTreeData>();
+    readonly onDidChangeTreeData: vscode.Event<PullRequestTreeData> = this._onDidChangeTreeData.event;
 
     private pullRequests: PullRequest[];
 

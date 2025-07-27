@@ -92,8 +92,8 @@ export interface TimelineEvent {
 }
 
 export class GiteaService {
-    private client: AxiosInstance;
-    private config: vscode.WorkspaceConfiguration;
+    private readonly client: AxiosInstance;
+    private readonly config: vscode.WorkspaceConfiguration;
 
     constructor() {
         this.config = vscode.workspace.getConfiguration('gitea');
