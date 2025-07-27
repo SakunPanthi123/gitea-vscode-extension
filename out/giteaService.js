@@ -125,6 +125,24 @@ class GiteaService {
             throw new Error(`Failed to fetch pull request files: ${error.message}`);
         }
     }
+    async getIssueTimeline(index) {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/issues/${index}/timeline`);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to fetch issue timeline: ${error.message}`);
+        }
+    }
+    async getPullRequestTimeline(index) {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/issues/${index}/timeline`);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to fetch pull request timeline: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map

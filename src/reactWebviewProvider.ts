@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { GiteaService, PullRequest, Issue } from './giteaService';
+import { GiteaService, PullRequest, Issue, TimelineEvent } from './giteaService';
 
 interface AssetManifest {
     files: {
@@ -66,6 +66,15 @@ export class ReactWebviewProvider {
                         vscode.window.showErrorMessage(`Failed to refresh PR: ${error}`);
                     }
                     break;
+                case 'getTimeline':
+                    try {
+                        const timeline = await this.giteaService.getPullRequestTimeline(message.pullRequestNumber);
+                        panel.webview.postMessage({ type: 'timelineData', data: timeline });
+                    } catch (error) {
+                        vscode.window.showErrorMessage(`Failed to fetch timeline: ${error}`);
+                        panel.webview.postMessage({ type: 'timelineData', data: [] });
+                    }
+                    break;
             }
         });
     }
@@ -112,6 +121,15 @@ export class ReactWebviewProvider {
                         panel.webview.postMessage({ type: 'updateData', data: updatedIssue });
                     } catch (error) {
                         vscode.window.showErrorMessage(`Failed to refresh issue: ${error}`);
+                    }
+                    break;
+                case 'getTimeline':
+                    try {
+                        const timeline = await this.giteaService.getIssueTimeline(message.issueNumber);
+                        panel.webview.postMessage({ type: 'timelineData', data: timeline });
+                    } catch (error) {
+                        vscode.window.showErrorMessage(`Failed to fetch timeline: ${error}`);
+                        panel.webview.postMessage({ type: 'timelineData', data: [] });
                     }
                     break;
             }

@@ -9,6 +9,7 @@ A modern React-based VS Code extension to integrate with Gitea repositories, all
 - ⚛️ Modern React-based webview with Tailwind CSS styling
 - 🔄 Refresh data with a click
 - 📖 Detailed view for individual pull requests and issues
+- ⏱️ Timeline view showing events for issues and pull requests
 - 🎨 VS Code theme-aware UI components
 - 🚀 Better development experience with hot reloading
 
@@ -101,6 +102,7 @@ Click on any item to see detailed information in a modern React-based webview.
 - **Improved Performance**: Optimized React components with proper state management
 - **Better Error Handling**: More robust error handling and user feedback
 - **Enhanced Styling**: Professional UI with consistent design patterns
+- **Timeline Feature**: View detailed timeline of events for issues and pull requests including comments, labels, commits, merges, and more
 
 ## Development Workflow
 

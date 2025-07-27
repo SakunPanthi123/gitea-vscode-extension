@@ -16,7 +16,13 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "*",
+    "onCommand:gitea.viewPullRequests",
+    "onCommand:gitea.viewIssues",
+    "onCommand:gitea.refreshPullRequests",
+    "onCommand:gitea.refreshIssues",
+    "onCommand:gitea.showPullRequestDetails",
+    "onCommand:gitea.showIssueDetails"
   ],
   "main": "./out/extension.js",
   "contributes": {

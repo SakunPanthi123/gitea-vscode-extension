@@ -42,6 +42,55 @@ export interface Issue {
     html_url: string;
 }
 
+export interface TimelineEvent {
+    id: number;
+    type: string;
+    html_url: string;
+    pull_request_url: string;
+    issue_url: string;
+    user: {
+        id: number;
+        login: string;
+        login_name: string;
+        full_name: string;
+        email: string;
+        avatar_url: string;
+        html_url: string;
+        username: string;
+    };
+    body: string;
+    created_at: string;
+    updated_at: string;
+    old_project_id: number;
+    project_id: number;
+    old_milestone: any;
+    milestone: any;
+    tracked_time: any;
+    old_title: string;
+    new_title: string;
+    old_ref: string;
+    new_ref: string;
+    ref_issue: any;
+    ref_comment: any;
+    ref_action: string;
+    ref_commit_sha: string;
+    review_id: number;
+    label: {
+        id: number;
+        name: string;
+        exclusive: boolean;
+        is_archived: boolean;
+        color: string;
+        description: string;
+        url: string;
+    } | null;
+    assignee: any;
+    assignee_team: any;
+    removed_assignee: boolean;
+    resolve_doer: any;
+    dependent_issue: any;
+}
+
 export class GiteaService {
     private client: AxiosInstance;
     private config: vscode.WorkspaceConfiguration;
@@ -134,6 +183,24 @@ export class GiteaService {
             return response.data;
         } catch (error: any) {
             throw new Error(`Failed to fetch pull request files: ${error.message}`);
+        }
+    }
+
+    async getIssueTimeline(index: number): Promise<TimelineEvent[]> {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/issues/${index}/timeline`);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch issue timeline: ${error.message}`);
+        }
+    }
+
+    async getPullRequestTimeline(index: number): Promise<TimelineEvent[]> {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/issues/${index}/timeline`);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch pull request timeline: ${error.message}`);
         }
     }
 }
