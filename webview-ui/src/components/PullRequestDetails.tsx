@@ -161,9 +161,9 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 mb-6">
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Branch Information</h3>
             <div className="flex items-center gap-2 text-sm">
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -186,24 +186,6 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               </div>
             )}
           </div>
-
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-3">Description</h3>
-            {data.body ? (
-              <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-sm text-gray-300">
-                  {data.body}
-                </pre>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-400 italic">
-                No description provided
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
           <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Author</h3>
             <div className="flex items-center gap-3">
@@ -217,7 +199,24 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               </div>
             </div>
           </div>
+        </div>
 
+        <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-3">Description</h3>
+          {data.body ? (
+            <div className="prose prose-invert max-w-none">
+              <pre className="whitespace-pre-wrap text-sm text-gray-300">
+                {data.body}
+              </pre>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">
+              No description provided
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-4">
           <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>
             <Timeline events={timelineData} isLoading={isLoadingTimeline} />
