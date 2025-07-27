@@ -158,49 +158,29 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
-                      <h3 className="text-lg font-semibold mb-3">Timeline</h3>
-                      <Timeline events={timelineData} isLoading={isLoadingTimeline} />
-                    </div>
-        <div className="lg:col-span-2">
-          {data.labels && data.labels.length > 0 && (
-            <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 mb-6">
-              <h3 className="text-lg font-semibold mb-3">Labels</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.labels.map((label, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 rounded text-sm font-medium"
-                    style={{
-                      backgroundColor: `#${label.color}`,
-                      color: "#000",
-                    }}
-                  >
-                    {label.name}
-                  </span>
-                ))}
+      <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5 ">
+            {data.labels && data.labels.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Labels</h3>
+                <div className="flex flex-wrap gap-2">
+                  {data.labels.map((label, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 rounded text-sm font-medium"
+                      style={{
+                        backgroundColor: `#${label.color}`,
+                        color: "#000",
+                      }}
+                    >
+                      {label.name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-3">Description</h3>
-            {data.body ? (
-              <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-sm text-gray-300">
-                  {data.body}
-                </pre>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-400 italic">
-                No description provided
-              </p>
             )}
           </div>
-        </div>
-
-        <div className="space-y-4">
           <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Author</h3>
             <div className="flex items-center gap-3">
@@ -214,7 +194,26 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               </div>
             </div>
           </div>
-
+        </div>
+        <div className="">
+          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 ">
+            <h3 className="text-lg font-semibold mb-3">Description</h3>
+            {data.body ? (
+              <div className="prose prose-invert max-w-none">
+                <pre className="whitespace-pre-wrap text-sm text-gray-300">
+                  {data.body}
+                </pre>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400 italic">
+                No description provided
+              </p>
+            )}
+          </div>
+          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 mt-4">
+            <h3 className="text-lg font-semibold mb-3">Timeline</h3>
+            <Timeline events={timelineData} isLoading={isLoadingTimeline} />
+          </div>
         </div>
       </div>
     </div>

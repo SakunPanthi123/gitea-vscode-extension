@@ -194,14 +194,16 @@ const Timeline: React.FC<Props> = ({ events, isLoading }) => {
                 className="w-6 h-6 rounded-full"
               />
               <div className="flex-1">
-                <div className="flex items-center gap-2 text-sm">
+                <div className="flex items-start gap-2 text-sm">
                   <span className="font-medium">{event.user.login}</span>
-                  <span className="text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400">
                     {getEventDescription(event)}
                   </span>
-                  <span className="text-gray-500 text-xs">
+                  <span className="text-gray-500 text-xs whitespace-nowrap">
                     {formatDate(event.created_at)}
                   </span>
+                  </div>
                 </div>
 
                 {event.type === "label" && event.label && (
