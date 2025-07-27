@@ -15,15 +15,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "*",
-    "onCommand:gitea.viewPullRequests",
-    "onCommand:gitea.viewIssues",
-    "onCommand:gitea.refreshPullRequests",
-    "onCommand:gitea.refreshIssues",
-    "onCommand:gitea.showPullRequestDetails",
-    "onCommand:gitea.showIssueDetails"
-  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -76,11 +67,13 @@
       "gitea-panel": [
         {
           "id": "giteaPullRequests",
+          "icon": "icon.svg",
           "name": "Pull Requests",
           "when": "giteaPullRequestsVisible"
         },
         {
           "id": "giteaIssues",
+          "icon": "icon.svg",
           "name": "Issues",
           "when": "giteaIssuesVisible"
         }
