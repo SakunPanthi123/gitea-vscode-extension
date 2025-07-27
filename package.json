@@ -2,7 +2,7 @@
   "name": "gitea-integration",
   "displayName": "Gitea Integration",
   "description": "A modern React-based VS Code extension to integrate with Gitea repositories, allowing you to view and manage pull requests and issues",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "publisher": "SakunPanthi",
   "repository": {
     "type": "git",
