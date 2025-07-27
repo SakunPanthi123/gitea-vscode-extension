@@ -153,6 +153,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               events={timelineData}
               isLoading={isLoadingTimeline}
               onMessage={onMessage}
+              enableCommits={true}
             />
           </div>
         </div>

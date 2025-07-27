@@ -5,9 +5,15 @@ interface Props {
   events: TimelineEvent[];
   isLoading?: boolean;
   onMessage?: (type: string, payload?: any) => void;
+  enableCommits?: boolean; // New prop to control commit functionality
 }
 
-const Timeline: React.FC<Props> = ({ events, isLoading, onMessage }) => {
+const Timeline: React.FC<Props> = ({
+  events,
+  isLoading,
+  onMessage,
+  enableCommits = true,
+}) => {
   const [commitDetails, setCommitDetails] = useState<
     Record<string, CommitDetails>
   >({});
@@ -66,7 +72,7 @@ const Timeline: React.FC<Props> = ({ events, isLoading, onMessage }) => {
 
   // Auto-fetch commit details when events change
   useEffect(() => {
-    if (!onMessage || !events) return;
+    if (!onMessage || !events || !enableCommits) return;
 
     const commitIds: string[] = [];
     events.forEach((event) => {
@@ -80,7 +86,7 @@ const Timeline: React.FC<Props> = ({ events, isLoading, onMessage }) => {
     commitIds.forEach((commitId) => {
       fetchCommitDetails(commitId);
     });
-  }, [events, onMessage, fetchCommitDetails]);
+  }, [events, onMessage, fetchCommitDetails, enableCommits]);
 
   const handleShowCommitDetails = (commitId: string) => {
     if (onMessage && commitDetails[commitId]) {
@@ -182,7 +188,7 @@ const Timeline: React.FC<Props> = ({ events, isLoading, onMessage }) => {
   };
 
   const renderCommitDetails = (event: TimelineEvent) => {
-    if (event.type !== "pull_push") return null;
+    if (event.type !== "pull_push" || !enableCommits) return null;
 
     const commitIds = extractCommitIds(event);
     if (commitIds.length === 0) return null;

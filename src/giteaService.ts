@@ -205,7 +205,10 @@ export class GiteaService {
 
   async getIssues(): Promise<Issue[]> {
     try {
-      const response = await this.client.get(`/${this.getRepoPath()}/issues`);
+      // Filter out pull requests by using type=issues query parameter
+      const response = await this.client.get(
+        `/${this.getRepoPath()}/issues?type=issues`
+      );
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to fetch issues: ${error.message}`);

@@ -174,25 +174,6 @@ export class ReactWebviewProvider {
             panel.webview.postMessage({ type: "timelineData", data: [] });
           }
           break;
-        case "getCommitDetails":
-          try {
-            const commitDetails = await this.giteaService.getCommitDetails(
-              message.commitId
-            );
-            panel.webview.postMessage({
-              type: "commitDetails",
-              commitId: message.commitId,
-              data: commitDetails,
-            });
-          } catch (error) {
-            vscode.window.showErrorMessage(
-              `Failed to fetch commit details: ${error}`
-            );
-          }
-          break;
-        case "showCommitDetails":
-          this.showCommitDetails(message.data);
-          break;
       }
     });
   }
@@ -439,7 +420,7 @@ export class ReactWebviewProvider {
     const panel = vscode.window.createWebviewPanel(
       ReactWebviewProvider.detailsViewType,
       `Commit ${commitDetails.sha.substring(0, 8)}`,
-      vscode.ViewColumn.Beside
+      vscode.ViewColumn.Beside, // Open beside current panel
       {
         enableScripts: true,
         retainContextWhenHidden: true,

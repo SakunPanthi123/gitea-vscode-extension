@@ -149,6 +149,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               events={timelineData}
               isLoading={isLoadingTimeline}
               onMessage={onMessage}
+              enableCommits={false}
             />
           </div>
         </div>
