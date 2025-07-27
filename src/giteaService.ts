@@ -205,7 +205,9 @@ export class GiteaService {
 
   async getIssues(): Promise<Issue[]> {
     try {
-      // Filter out pull requests by using type=issues query parameter
+      // Filter out pull requests by using type=issues query parameter.
+      // what a brilliant foresight by copilot. it actually filters out pull requests.
+      // This is necessary because Gitea's issues API returns both issues and pull requests.
       const response = await this.client.get(
         `/${this.getRepoPath()}/issues?type=issues`
       );

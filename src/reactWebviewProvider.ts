@@ -420,7 +420,7 @@ export class ReactWebviewProvider {
     const panel = vscode.window.createWebviewPanel(
       ReactWebviewProvider.detailsViewType,
       `Commit ${commitDetails.sha.substring(0, 8)}`,
-      vscode.ViewColumn.Beside, // Open beside current panel
+      vscode.ViewColumn.One,
       {
         enableScripts: true,
         retainContextWhenHidden: true,
