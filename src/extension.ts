@@ -90,5 +90,3 @@ export function activate(context: vscode.ExtensionContext) {
         listAllIssuesCommand
     );
 }
-
-export function deactivate() {}

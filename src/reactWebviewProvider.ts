@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
-import { GiteaService, PullRequest, Issue, TimelineEvent } from './giteaService';
+import { GiteaService, PullRequest, Issue } from './giteaService';
 
 interface AssetManifest {
     files: {
