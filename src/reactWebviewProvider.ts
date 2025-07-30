@@ -70,7 +70,7 @@ export class ReactWebviewProvider {
             );
             panel.webview.postMessage({ type: "updateData", data: updatedPR });
           } catch (error) {
-            vscode.window.showErrorMessage(`Failed to refresh PR: ${error}`);
+            // vscode.window.showErrorMessage(`Failed to refresh PR: ${error}`);
           }
           break;
         case "getTimeline":
@@ -80,9 +80,9 @@ export class ReactWebviewProvider {
             );
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {
-            vscode.window.showErrorMessage(
-              `Failed to fetch timeline: ${error}`
-            );
+            // vscode.window.showErrorMessage(
+            //   `Failed to fetch timeline: ${error}`
+            // );
             panel.webview.postMessage({ type: "timelineData", data: [] });
           }
           break;
@@ -227,7 +227,7 @@ export class ReactWebviewProvider {
               data: updatedIssue,
             });
           } catch (error) {
-            vscode.window.showErrorMessage(`Failed to refresh issue: ${error}`);
+            // vscode.window.showErrorMessage(`Failed to refresh issue: ${error}`);
           }
           break;
         case "getTimeline":
@@ -237,9 +237,9 @@ export class ReactWebviewProvider {
             );
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {
-            vscode.window.showErrorMessage(
-              `Failed to fetch timeline: ${error}`
-            );
+            // vscode.window.showErrorMessage(
+            //   `Failed to fetch timeline: ${error}`
+            // );
             panel.webview.postMessage({ type: "timelineData", data: [] });
           }
           break;
@@ -327,7 +327,7 @@ export class ReactWebviewProvider {
               data: labels,
             });
           } catch (error) {
-            vscode.window.showErrorMessage(`Failed to fetch labels: ${error}`);
+            // vscode.window.showErrorMessage(`Failed to fetch labels: ${error}`);
           }
           break;
         case "updateIssueLabels":
@@ -447,9 +447,9 @@ export class ReactWebviewProvider {
             const issues = await this.giteaService.getIssues();
             panel.webview.postMessage({ type: "updateData", data: issues });
           } catch (error) {
-            vscode.window.showErrorMessage(
-              `Failed to refresh issues: ${error}`
-            );
+            // vscode.window.showErrorMessage(
+            //   `Failed to refresh issues: ${error}`
+            // );
           }
           break;
       }

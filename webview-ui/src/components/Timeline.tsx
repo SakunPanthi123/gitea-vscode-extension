@@ -173,14 +173,39 @@ const Timeline: React.FC<Props> = ({
     }
   };
 
+  // Helper function to determine if a label was added or removed
+  const getLabelAction = (
+    currentEvent: TimelineEvent,
+    allEvents: TimelineEvent[]
+  ) => {
+    if (!currentEvent.label || currentEvent.type !== "label") {
+      return "modified labels";
+    }
+
+    const labelId = currentEvent.label.id;
+    let occurrenceCount = 0;
+
+    // Count occurrences of this label up to the current event
+    for (const event of allEvents) {
+      if (event.type === "label" && event.label && event.label.id === labelId) {
+        occurrenceCount++;
+        if (event.id === currentEvent.id) {
+          break;
+        }
+      }
+    }
+
+    // Odd occurrences = added, Even occurrences = removed
+    const action = occurrenceCount % 2 === 1 ? "added" : "removed";
+    return `${action} label "${currentEvent.label.name}"`;
+  };
+
   const getEventDescription = (event: TimelineEvent) => {
     switch (event.type) {
       case "comment":
         return "commented";
       case "label":
-        return event.label
-          ? `added label "${event.label.name}"`
-          : "modified labels";
+        return getLabelAction(event, events);
       case "project":
         return event.project_id ? "added to project" : "removed from project";
       case "pull_push":
