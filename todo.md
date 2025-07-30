@@ -9,6 +9,7 @@ Major and urgent:
 -[] Implement better ref label: 'Sakun referenced a pull request that will close this issue 2 days ago.
 WIP: Feat Account Module #374' instead of 'Sakun comment ref 2 days ago' and make the ref label clickable to open the pull request in a new tab.
 -[X] Implement add comment, edit comment and delete comment feature in the details webview for better.
+-[] Create Issues via web view
 
 Major, minor and future:
 
