@@ -144,3 +144,7 @@ export interface Comment {
 export interface CommentCreateRequest {
   body: string;
 }
+
+export interface CommentEditRequest {
+  body: string;
+}

@@ -7,6 +7,7 @@ import {
   TimelineEvent,
   Comment,
   CommentCreateRequest,
+  CommentEditRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -175,6 +176,21 @@ export class GiteaService {
       );
     } catch (error: any) {
       throw new Error(`Failed to delete comment: ${error.message}`);
+    }
+  }
+
+  async editComment(
+    commentId: number,
+    comment: CommentEditRequest
+  ): Promise<Comment> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/issues/comments/${commentId}`,
+        comment
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to edit comment: ${error.message}`);
     }
   }
 }

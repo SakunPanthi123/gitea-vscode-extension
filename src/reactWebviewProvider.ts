@@ -130,6 +130,25 @@ export class ReactWebviewProvider {
             );
           }
           break;
+        case "editComment":
+          try {
+            const updatedComment = await this.giteaService.editComment(
+              message.commentId,
+              { body: message.body }
+            );
+            panel.webview.postMessage({
+              type: "commentEdited",
+              data: updatedComment,
+            });
+            // Also refresh timeline to show updated comment
+            const timeline = await this.giteaService.getPullRequestTimeline(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to edit comment: ${error}`);
+          }
+          break;
       }
     });
   }
@@ -217,6 +236,25 @@ export class ReactWebviewProvider {
             vscode.window.showErrorMessage(
               `Failed to delete comment: ${error}`
             );
+          }
+          break;
+        case "editComment":
+          try {
+            const updatedComment = await this.giteaService.editComment(
+              message.commentId,
+              { body: message.body }
+            );
+            panel.webview.postMessage({
+              type: "commentEdited",
+              data: updatedComment,
+            });
+            // Also refresh timeline to show updated comment
+            const timeline = await this.giteaService.getIssueTimeline(
+              message.issueNumber || issue.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to edit comment: ${error}`);
           }
           break;
       }

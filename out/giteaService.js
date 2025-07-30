@@ -172,6 +172,15 @@ class GiteaService {
             throw new Error(`Failed to delete comment: ${error.message}`);
         }
     }
+    async editComment(commentId, comment) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/issues/comments/${commentId}`, comment);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to edit comment: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map
