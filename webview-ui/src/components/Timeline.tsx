@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TimelineEvent, CommitDetails } from "./../../../types/_types";
+import { Icons } from "./Icons";
 
 interface Props {
   events: TimelineEvent[];
@@ -20,6 +21,7 @@ const Timeline: React.FC<Props> = ({
     Record<string, CommitDetails>
   >({});
   const [loadingCommits, setLoadingCommits] = useState<Set<string>>(new Set());
+  const [deleteState, setDeleteState] = useState<boolean>(false);
 
   // Extract commit IDs from pull_push events
   const extractCommitIds = (event: TimelineEvent): string[] => {
@@ -355,15 +357,43 @@ const Timeline: React.FC<Props> = ({
                       {formatDate(event.created_at)}
                     </span>
                   </div>
-                  {event.type === "comment" && canDeleteComments && (
+                  {event.type === "comment" && canDeleteComments &&
+                  !deleteState ?
+                  (
                     <button
-                      onClick={() => handleDeleteComment(event.id)}
-                      className="ml-2 px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-400 hover:bg-opacity-10 rounded transition-colors"
+                      onClick={() => {
+                        setDeleteState(true)
+                      }}
+                      className="ml-2 px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
                       title="Delete comment"
                     >
-                      🗑️
+                      <Icons 
+                        name="trash"
+                      />
                     </button>
-                  )}
+                  )
+                : event.type === "comment" && canDeleteComments && (
+                  <div className="flex gap-2.5">
+                    <button
+                      onClick={() => {
+                        handleDeleteComment(event.id);
+                        setDeleteState(false);
+                      }}
+                      className="ml-2 px-2 py-1 hover:bg-opacity-10 rounded transition-colors"
+                    >
+                      Confirm
+                    </button>
+                      <button
+                      onClick={() => {
+                        setDeleteState(false)
+                      }}
+                      className="ml-2 px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover hover:bg-opacity-10 rounded transition-colors"
+                      >
+                      Cancel
+                      </button>
+                  </div>
+                )
+                }
                 </div>
 
                 {event.type === "label" && event.label && (
