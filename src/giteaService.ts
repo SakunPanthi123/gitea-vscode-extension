@@ -5,6 +5,8 @@ import {
   Issue,
   PullRequest,
   TimelineEvent,
+  Comment,
+  CommentCreateRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -148,6 +150,31 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to fetch commit details: ${error.message}`);
+    }
+  }
+
+  async addComment(
+    issueNumber: number,
+    comment: CommentCreateRequest
+  ): Promise<Comment> {
+    try {
+      const response = await this.client.post(
+        `/${this.getRepoPath()}/issues/${issueNumber}/comments`,
+        comment
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to add comment: ${error.message}`);
+    }
+  }
+
+  async deleteComment(commentId: number): Promise<void> {
+    try {
+      await this.client.delete(
+        `/${this.getRepoPath()}/issues/comments/${commentId}`
+      );
+    } catch (error: any) {
+      throw new Error(`Failed to delete comment: ${error.message}`);
     }
   }
 }

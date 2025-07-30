@@ -155,6 +155,23 @@ class GiteaService {
             throw new Error(`Failed to fetch commit details: ${error.message}`);
         }
     }
+    async addComment(issueNumber, comment) {
+        try {
+            const response = await this.client.post(`/${this.getRepoPath()}/issues/${issueNumber}/comments`, comment);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to add comment: ${error.message}`);
+        }
+    }
+    async deleteComment(commentId) {
+        try {
+            await this.client.delete(`/${this.getRepoPath()}/issues/comments/${commentId}`);
+        }
+        catch (error) {
+            throw new Error(`Failed to delete comment: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map

@@ -105,6 +105,31 @@ export class ReactWebviewProvider {
         case "showCommitDetails":
           this.showCommitDetails(message.data);
           break;
+        case "addComment":
+          try {
+            const comment = await this.giteaService.addComment(
+              message.pullRequestNumber,
+              { body: message.body }
+            );
+            panel.webview.postMessage({ type: "commentAdded", data: comment });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to add comment: ${error}`);
+            panel.webview.postMessage({ type: "commentError", error: error });
+          }
+          break;
+        case "deleteComment":
+          try {
+            await this.giteaService.deleteComment(message.commentId);
+            panel.webview.postMessage({
+              type: "commentDeleted",
+              commentId: message.commentId,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to delete comment: ${error}`
+            );
+          }
+          break;
       }
     });
   }
@@ -167,6 +192,31 @@ export class ReactWebviewProvider {
               `Failed to fetch timeline: ${error}`
             );
             panel.webview.postMessage({ type: "timelineData", data: [] });
+          }
+          break;
+        case "addComment":
+          try {
+            const comment = await this.giteaService.addComment(
+              message.issueNumber,
+              { body: message.body }
+            );
+            panel.webview.postMessage({ type: "commentAdded", data: comment });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to add comment: ${error}`);
+            panel.webview.postMessage({ type: "commentError", error: error });
+          }
+          break;
+        case "deleteComment":
+          try {
+            await this.giteaService.deleteComment(message.commentId);
+            panel.webview.postMessage({
+              type: "commentDeleted",
+              commentId: message.commentId,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to delete comment: ${error}`
+            );
           }
           break;
       }

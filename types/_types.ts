@@ -126,3 +126,21 @@ export interface CommitDetails {
   stats: CommitStats;
   html_url: string;
 }
+
+export interface Comment {
+  id: number;
+  html_url: string;
+  pull_request_url: string;
+  issue_url: string;
+  user: User;
+  original_author: string;
+  original_author_id: number;
+  body: string;
+  assets: any[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommentCreateRequest {
+  body: string;
+}

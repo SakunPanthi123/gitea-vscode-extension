@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
+import CommentBox from "./CommentBox";
 import { PullRequest, TimelineEvent } from "./../../../types/_types";
 
 interface Props {
@@ -13,6 +14,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     timeline || []
   );
   const [isLoadingTimeline, setIsLoadingTimeline] = useState(!timeline);
+  const [isAddingComment, setIsAddingComment] = useState(false);
 
   useEffect(() => {
     if (!timeline) {
@@ -28,12 +30,19 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       if (message.type === "timelineData") {
         setTimelineData(message.data);
         setIsLoadingTimeline(false);
+      } else if (message.type === "commentAdded") {
+        // Refresh timeline when comment is added
+        onMessage("getTimeline", { pullRequestNumber: data.number });
+        setIsAddingComment(false);
+      } else if (message.type === "commentDeleted") {
+        // Refresh timeline when comment is deleted
+        onMessage("getTimeline", { pullRequestNumber: data.number });
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [data.number, onMessage]);
 
   const handleRefresh = () => {
     onMessage("refresh");
@@ -43,6 +52,11 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleOpenExternal = (url: string) => {
     onMessage("openExternal", { url });
+  };
+
+  const handleAddComment = (comment: string) => {
+    setIsAddingComment(true);
+    onMessage("addComment", { pullRequestNumber: data.number, body: comment });
   };
 
   const formatDate = (dateString: string) => {
@@ -154,6 +168,13 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               isLoading={isLoadingTimeline}
               onMessage={onMessage}
               enableCommits={true}
+              canDeleteComments={true}
+            />
+          </div>
+          <div>
+            <CommentBox
+              onAddComment={handleAddComment}
+              isLoading={isAddingComment}
             />
           </div>
         </div>

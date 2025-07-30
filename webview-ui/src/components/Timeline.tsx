@@ -6,6 +6,7 @@ interface Props {
   isLoading?: boolean;
   onMessage?: (type: string, payload?: any) => void;
   enableCommits?: boolean; // New prop to control commit functionality
+  canDeleteComments?: boolean; // New prop to control comment deletion
 }
 
 const Timeline: React.FC<Props> = ({
@@ -13,6 +14,7 @@ const Timeline: React.FC<Props> = ({
   isLoading,
   onMessage,
   enableCommits = true,
+  canDeleteComments = true,
 }) => {
   const [commitDetails, setCommitDetails] = useState<
     Record<string, CommitDetails>
@@ -93,6 +95,12 @@ const Timeline: React.FC<Props> = ({
       onMessage("showCommitDetails", { data: commitDetails[commitId] });
     }
   };
+  const handleDeleteComment = (commentId: number) => {
+    if (onMessage) {
+      onMessage("deleteComment", { commentId });
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -339,7 +347,7 @@ const Timeline: React.FC<Props> = ({
               <div className="flex-1">
                 <div className="flex items-start gap-2 text-sm">
                   <span className="font-medium">{event.user.login}</span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-1">
                     <span className="text-gray-400">
                       {getEventDescription(event)}
                     </span>
@@ -347,6 +355,15 @@ const Timeline: React.FC<Props> = ({
                       {formatDate(event.created_at)}
                     </span>
                   </div>
+                  {event.type === "comment" && canDeleteComments && (
+                    <button
+                      onClick={() => handleDeleteComment(event.id)}
+                      className="ml-2 px-2 py-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-400 hover:bg-opacity-10 rounded transition-colors"
+                      title="Delete comment"
+                    >
+                      🗑️
+                    </button>
+                  )}
                 </div>
 
                 {event.type === "label" && event.label && (
