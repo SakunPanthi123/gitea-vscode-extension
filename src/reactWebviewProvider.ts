@@ -347,6 +347,36 @@ export class ReactWebviewProvider {
             vscode.window.showErrorMessage(`Failed to update labels: ${error}`);
           }
           break;
+        case "getRepositoryAssignees":
+          try {
+            const assignees = await this.giteaService.getRepositoryAssignees();
+            panel.webview.postMessage({
+              type: "repositoryAssignees",
+              data: assignees,
+            });
+          } catch (error) {
+            // vscode.window.showErrorMessage(`Failed to fetch assignees: ${error}`);
+          }
+          break;
+        case "updateIssueAssignees":
+          try {
+            const updatedIssue = await this.giteaService.updateIssueAssignees(
+              issue.number,
+              { assignees: message.assignees }
+            );
+            panel.webview.postMessage({
+              type: "assigneesUpdated",
+              data: updatedIssue,
+            });
+            vscode.window.showInformationMessage(
+              "Issue assignees updated successfully"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to update assignees: ${error}`
+            );
+          }
+          break;
       }
     });
   }

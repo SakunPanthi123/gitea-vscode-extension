@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
 import CommentBox from "./CommentBox";
 import LabelPicker from "./LabelPicker";
-import { Issue, TimelineEvent, Label } from "../../../types/_types";
+import AssigneePicker from "./AssigneePicker";
+import { Issue, TimelineEvent, Label, User } from "../../../types/_types";
 
 interface Props {
   data: Issue;
@@ -18,6 +19,8 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [availableLabels, setAvailableLabels] = useState<Label[]>([]);
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
+  const [availableAssignees, setAvailableAssignees] = useState<User[]>([]);
+  const [isLoadingAssignees, setIsLoadingAssignees] = useState(false);
 
   useEffect(() => {
     if (!timeline) {
@@ -27,6 +30,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
     // Request available labels
     onMessage("getRepositoryLabels");
+
+    // Request available assignees
+    onMessage("getRepositoryAssignees");
   }, [data.number, timeline, onMessage]);
 
   useEffect(() => {
@@ -55,6 +61,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         setIsLoadingLabels(false);
       } else if (message.type === "labelsUpdated") {
         // Labels were updated, refresh the issue data
+        onMessage("refresh");
+      } else if (message.type === "repositoryAssignees") {
+        setAvailableAssignees(message.data);
+        setIsLoadingAssignees(false);
+      } else if (message.type === "assigneesUpdated") {
+        // Assignees were updated, refresh the issue data
         onMessage("refresh");
       }
     };
@@ -91,6 +103,11 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     onMessage("updateIssueLabels", { labelIds });
   };
 
+  const handleAssigneesChange = (newAssignees: User[]) => {
+    const assigneeUsernames = newAssignees.map((assignee) => assignee.login);
+    onMessage("updateIssueAssignees", { assignees: assigneeUsernames });
+  };
+
   // Convert simplified issue labels to full Label objects when possible
   const getCurrentLabels = (): Label[] => {
     if (!data.labels) return [];
@@ -116,6 +133,11 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         url: "",
       };
     });
+  };
+
+  const getCurrentAssignees = (): User[] => {
+    if (!data.assignees) return [];
+    return data.assignees;
   };
 
   const formatDate = (dateString: string) => {
@@ -180,7 +202,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5 ">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
@@ -211,6 +233,42 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                 <p className="text-sm text-gray-400 italic">
                   No labels assigned
                 </p>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5">
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">Assignees</h3>
+                <AssigneePicker
+                  availableAssignees={availableAssignees}
+                  currentAssignees={getCurrentAssignees()}
+                  onAssigneesChange={handleAssigneesChange}
+                  isLoading={isLoadingAssignees}
+                />
+              </div>
+              {data.assignees && data.assignees.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {data.assignees.map((assignee) => (
+                    <div key={assignee.id} className="flex items-center gap-2">
+                      <img
+                        src={assignee.avatar_url}
+                        alt={assignee.login}
+                        className="w-6 h-6 rounded-full"
+                      />
+                      <span className="text-sm font-medium">
+                        {assignee.login}
+                      </span>
+                      {assignee.full_name && (
+                        <span className="text-xs text-gray-400">
+                          ({assignee.full_name})
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400 italic">No assignees</p>
               )}
             </div>
           </div>

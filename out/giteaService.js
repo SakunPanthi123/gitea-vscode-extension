@@ -252,6 +252,24 @@ class GiteaService {
             throw new Error(`Failed to replace issue labels: ${error.message}`);
         }
     }
+    async getRepositoryAssignees() {
+        try {
+            const response = await this.client.get(`/${this.getRepoPath()}/assignees`);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to fetch repository assignees: ${error.message}`);
+        }
+    }
+    async updateIssueAssignees(issueNumber, assignees) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/issues/${issueNumber}`, assignees);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to update issue assignees: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map

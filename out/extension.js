@@ -72,7 +72,7 @@ function activate(context) {
             vscode.window.showInformationMessage('Pull requests refreshed successfully!');
         }
         catch (error) {
-            vscode.window.showErrorMessage(`Failed to refresh pull requests: ${error}`);
+            // vscode.window.showErrorMessage(`Failed to refresh pull requests: ${error}`);
         }
     });
     const refreshIssuesCommand = vscode.commands.registerCommand('gitea.refreshIssues', async () => {

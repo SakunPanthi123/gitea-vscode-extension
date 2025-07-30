@@ -35,6 +35,8 @@ export interface Issue {
     name: string;
     color: string;
   }>;
+  assignee?: User;
+  assignees: User[];
   created_at: string;
   updated_at: string;
   html_url: string;
@@ -159,4 +161,8 @@ export interface PullRequestStateChangeRequest {
 
 export interface LabelRequest {
   labels: (number | string)[];
+}
+
+export interface AssigneeRequest {
+  assignees: string[];
 }

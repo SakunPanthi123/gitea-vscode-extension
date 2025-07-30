@@ -12,6 +12,8 @@ import {
   PullRequestStateChangeRequest,
   Label,
   LabelRequest,
+  User,
+  AssigneeRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -295,6 +297,32 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to replace issue labels: ${error.message}`);
+    }
+  }
+
+  async getRepositoryAssignees(): Promise<User[]> {
+    try {
+      const response = await this.client.get(
+        `/${this.getRepoPath()}/assignees`
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to fetch repository assignees: ${error.message}`);
+    }
+  }
+
+  async updateIssueAssignees(
+    issueNumber: number,
+    assignees: AssigneeRequest
+  ): Promise<Issue> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/issues/${issueNumber}`,
+        assignees
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to update issue assignees: ${error.message}`);
     }
   }
 }
