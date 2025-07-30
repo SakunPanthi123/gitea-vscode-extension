@@ -84,7 +84,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-4">
             <span
-              className={`px-3 py-1 rounded text-sm font-medium ${
+              className={`px-3 py-1  text-sm font-medium ${
                 data.state === "open"
                   ? "bg-green-100 text-green-800"
                   : "bg-purple-100 text-purple-800"
@@ -107,27 +107,27 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="flex gap-3">
           <button
             onClick={handleRefresh}
-            className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors"
+            className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover  transition-colors"
           >
             Refresh
           </button>
           <button
             onClick={() => handleOpenExternal(data.html_url)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700  transition-colors"
           >
             Open in Gitea
           </button>
           {data.state === "open" ? (
             <button
               onClick={handleClosePullRequest}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700  transition-colors"
             >
               Close Pull Request
             </button>
           ) : (
             <button
               onClick={handleReopenPullRequest}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors"
+              className="px-4 py-2 bg-green-600 hover:bg-green-700  transition-colors"
             >
               Reopen Pull Request
             </button>
@@ -137,14 +137,14 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
       <div className="flex flex-col gap-6">
         <div className="flex gap-6">
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 w-full">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4 w-full">
             <h3 className="text-lg font-semibold mb-3">Branch Information</h3>
             <div className="flex items-center gap-2 text-sm">
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 ">
                 {data.head.ref}
               </span>
               <span>→</span>
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+              <span className="bg-green-100 text-green-800 px-2 py-1 ">
                 {data.base.ref}
               </span>
             </div>
@@ -161,13 +161,13 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             )}
           </div>
 
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 w-full">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4 w-full">
             <h3 className="text-lg font-semibold mb-3">Author</h3>
             <div className="flex items-center gap-3">
               <img
                 src={data.user.avatar_url}
                 alt={data.user.login}
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 -full"
               />
               <div>
                 <div className="font-medium">{data.user.login}</div>
@@ -182,7 +182,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           </div>
         </div>
 
-        <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
+        <div className="bg-gray-50 bg-opacity-5 -lg p-4">
           <h3 className="text-lg font-semibold mb-3">Description</h3>
           {data.body ? (
             <div className="prose prose-invert max-w-none">
@@ -198,7 +198,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>
             <Timeline
               events={timelineData}

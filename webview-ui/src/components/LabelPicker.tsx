@@ -68,7 +68,7 @@ const LabelPicker: React.FC<Props> = ({
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
-        className="flex items-center gap-2 px-3 py-2 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-3 py-2 bg-vscode-button hover:bg-vscode-button-hover  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span>🏷️</span>
         <span>Labels ({currentLabels.length})</span>
@@ -82,14 +82,14 @@ const LabelPicker: React.FC<Props> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-vscode-background border border-vscode-border rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-64 bg-vscode-background border border-vscode-border -lg shadow-lg z-50">
           <div className="p-2 border-b border-vscode-border">
             <input
               type="text"
               placeholder="Filter labels..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 text-sm bg-vscode-input text-vscode-foreground border border-gray-300 border-opacity-30 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 text-sm bg-vscode-input text-vscode-foreground border border-gray-300 border-opacity-30  focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -109,10 +109,10 @@ const LabelPicker: React.FC<Props> = ({
                     type="checkbox"
                     checked={currentLabelIds.has(label.id)}
                     onChange={() => {}} // Handled by onClick
-                    className="form-checkbox h-4 w-4 text-blue-500 rounded"
+                    className="form-checkbox h-4 w-4 text-blue-500 "
                   />
                   <span
-                    className="px-2 py-1 rounded text-xs font-medium flex-shrink-0"
+                    className="px-2 py-1  text-xs font-medium flex-shrink-0"
                     style={{
                       backgroundColor: `#${label.color}`,
                       color: getContrastColor(label.color),

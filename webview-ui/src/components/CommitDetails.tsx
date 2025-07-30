@@ -53,12 +53,12 @@ const CommitDetails: React.FC<Props> = ({ data, onMessage }) => {
 
       <div className="space-y-6">
         {/* Commit Header */}
-        <div className="bg-vscode-editor-background border border-vscode-panel-border rounded-lg p-4">
+        <div className="bg-vscode-editor-background border border-vscode-panel-border -lg p-4">
           <div className="flex items-start gap-3 mb-4">
             <img
               src={data.author.avatar_url}
               alt={data.author.login}
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 -full"
             />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -70,21 +70,21 @@ const CommitDetails: React.FC<Props> = ({ data, onMessage }) => {
               </div>
               <div className="text-sm text-gray-400">
                 SHA:{" "}
-                <code className="bg-gray-600 bg-opacity-30 px-1 rounded">
+                <code className="bg-gray-600 bg-opacity-30 px-1 ">
                   {data.sha.substring(0, 8)}
                 </code>
               </div>
             </div>
             <button
               onClick={() => handleOpenExternal(data.html_url)}
-              className="px-3 py-1 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors text-sm"
+              className="px-3 py-1 bg-vscode-button hover:bg-vscode-button-hover  transition-colors text-sm"
             >
               View on Gitea
             </button>
           </div>
 
           {/* Commit Message */}
-          <div className="bg-gray-50 bg-opacity-5 rounded border-l-4 border-blue-400 p-3">
+          <div className="bg-gray-50 bg-opacity-5  border-l-4 border-blue-400 p-3">
             <pre className="text-sm whitespace-pre-wrap text-gray-200">
               {data.commit.message.trim()}
             </pre>
@@ -92,15 +92,15 @@ const CommitDetails: React.FC<Props> = ({ data, onMessage }) => {
         </div>
 
         {/* Stats */}
-        <div className="bg-vscode-editor-background border border-vscode-panel-border rounded-lg p-4">
+        <div className="bg-vscode-editor-background border border-vscode-panel-border -lg p-4">
           <h3 className="text-lg font-semibold mb-3">Changes Summary</h3>
           <div className="flex gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-400 rounded-full"></span>
+              <span className="w-3 h-3 bg-green-400 -full"></span>
               <span>{data.stats.additions} additions</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-red-400 rounded-full"></span>
+              <span className="w-3 h-3 bg-red-400 -full"></span>
               <span>{data.stats.deletions} deletions</span>
             </div>
             <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ const CommitDetails: React.FC<Props> = ({ data, onMessage }) => {
         </div>
 
         {/* Files Changed */}
-        <div className="bg-vscode-editor-background border border-vscode-panel-border rounded-lg p-4">
+        <div className="bg-vscode-editor-background border border-vscode-panel-border -lg p-4">
           <h3 className="text-lg font-semibold mb-3">
             Files Changed ({data.files.length})
           </h3>
@@ -119,7 +119,7 @@ const CommitDetails: React.FC<Props> = ({ data, onMessage }) => {
             {data.files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 p-2 bg-gray-50 bg-opacity-5 rounded hover:bg-opacity-10 transition-colors"
+                className="flex items-center gap-3 p-2 bg-gray-50 bg-opacity-5  hover:bg-opacity-10 transition-colors"
               >
                 <span className="text-lg">
                   {getFileStatusIcon(file.status)}

@@ -259,12 +259,12 @@ const Timeline: React.FC<Props> = ({
           return (
             <div
               key={commitId}
-              className="bg-gray-50 bg-opacity-5 rounded border border-gray-300 border-opacity-20 p-3"
+              className="bg-gray-50 bg-opacity-5  border border-gray-300 border-opacity-20 p-3"
             >
               {isLoading ? (
                 <div className="animate-pulse">
-                  <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-3/4 mb-2"></div>
-                  <div className="h-2 bg-gray-300 bg-opacity-20 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-300 bg-opacity-20  w-3/4 mb-2"></div>
+                  <div className="h-2 bg-gray-300 bg-opacity-20  w-1/2"></div>
                 </div>
               ) : details ? (
                 <div>
@@ -275,7 +275,7 @@ const Timeline: React.FC<Props> = ({
                       </div>
                       <div className="text-xs text-gray-400 flex items-center gap-3">
                         <span>
-                          <code className="bg-gray-600 bg-opacity-30 px-1 rounded">
+                          <code className="bg-gray-600 bg-opacity-30 px-1 ">
                             {commitId.substring(0, 8)}
                           </code>
                         </span>
@@ -293,7 +293,7 @@ const Timeline: React.FC<Props> = ({
                     </div>
                     <button
                       onClick={() => handleShowCommitDetails(commitId)}
-                      className="px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors text-xs"
+                      className="px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover  transition-colors text-xs"
                     >
                       View Details
                     </button>
@@ -338,8 +338,8 @@ const Timeline: React.FC<Props> = ({
                 </div>
               ) : (
                 <div className="animate-pulse">
-                  <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-3/4 mb-2"></div>
-                  <div className="h-2 bg-gray-300 bg-opacity-20 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-300 bg-opacity-20  w-3/4 mb-2"></div>
+                  <div className="h-2 bg-gray-300 bg-opacity-20  w-1/2"></div>
                 </div>
               )}
             </div>
@@ -353,12 +353,12 @@ const Timeline: React.FC<Props> = ({
     return (
       <div className="space-y-4">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-300 bg-opacity-20 rounded w-1/2 mb-2"></div>
-          <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-300 bg-opacity-20  w-1/2 mb-2"></div>
+          <div className="h-3 bg-gray-300 bg-opacity-20  w-3/4"></div>
         </div>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-300 bg-opacity-20 rounded w-1/3 mb-2"></div>
-          <div className="h-3 bg-gray-300 bg-opacity-20 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-300 bg-opacity-20  w-1/3 mb-2"></div>
+          <div className="h-3 bg-gray-300 bg-opacity-20  w-1/2"></div>
         </div>
       </div>
     );
@@ -378,7 +378,7 @@ const Timeline: React.FC<Props> = ({
       {events.map((event, index) => (
         <div key={event.id} className="flex gap-3">
           <div className="flex flex-col items-center">
-            <div className="w-8 h-8 bg-gray-100 bg-opacity-10 rounded-full flex items-center justify-center text-sm">
+            <div className="w-8 h-8 bg-gray-100 bg-opacity-10 -full flex items-center justify-center text-sm">
               {getEventIcon(event.type)}
             </div>
             {index < events.length - 1 && (
@@ -391,7 +391,7 @@ const Timeline: React.FC<Props> = ({
               <img
                 src={event.user.avatar_url}
                 alt={event.user.login}
-                className="w-6 h-6 rounded-full"
+                className="w-6 h-6 -full"
               />
               <div className="flex-1">
                 <div className="flex items-start gap-2 text-sm">
@@ -413,7 +413,7 @@ const Timeline: React.FC<Props> = ({
                           onClick={() =>
                             handleEditComment(event.id, event.body)
                           }
-                          className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
+                          className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10  transition-colors"
                           title="Edit comment"
                         >
                           <Icons name="edit" />
@@ -423,7 +423,7 @@ const Timeline: React.FC<Props> = ({
                         onClick={() => {
                           setDeleteState(true);
                         }}
-                        className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
+                        className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10  transition-colors"
                         title="Delete comment"
                       >
                         <Icons name="trash" />
@@ -438,7 +438,7 @@ const Timeline: React.FC<Props> = ({
                             handleDeleteComment(event.id);
                             setDeleteState(false);
                           }}
-                          className="ml-2 px-2 py-1 hover:bg-opacity-10 rounded transition-colors"
+                          className="ml-2 px-2 py-1 hover:bg-opacity-10  transition-colors"
                         >
                           Confirm
                         </button>
@@ -446,7 +446,7 @@ const Timeline: React.FC<Props> = ({
                           onClick={() => {
                             setDeleteState(false);
                           }}
-                          className="ml-2 px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover hover:bg-opacity-10 rounded transition-colors"
+                          className="ml-2 px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover hover:bg-opacity-10  transition-colors"
                         >
                           Cancel
                         </button>
@@ -458,7 +458,7 @@ const Timeline: React.FC<Props> = ({
                 {event.type === "label" && event.label && (
                   <div className="mt-2">
                     <span
-                      className="px-2 py-1 rounded text-xs font-medium"
+                      className="px-2 py-1  text-xs font-medium"
                       style={{
                         backgroundColor: `#${event.label.color}`,
                         color: "#000",
@@ -472,24 +472,24 @@ const Timeline: React.FC<Props> = ({
                 {renderCommitDetails(event)}
 
                 {shouldShowBody(event) && (
-                  <div className="mt-2 p-3 bg-gray-50 bg-opacity-5 rounded border-l-2 border-gray-300 border-opacity-30">
+                  <div className="mt-2 p-3 bg-gray-50 bg-opacity-5  border-l-2 border-gray-300 border-opacity-30">
                     {editingCommentId === event.id ? (
                       <div className="space-y-3">
                         <textarea
                           value={editCommentText}
                           onChange={(e) => setEditCommentText(e.target.value)}
-                          className="w-full p-2 rounded border border-gray-300 border-opacity-30 bg-vscode-input text-vscode-foreground resize-vertical min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full p-2  border border-gray-300 border-opacity-30 bg-vscode-input text-vscode-foreground resize-vertical min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleSaveEdit(event.id)}
-                            className="px-3 py-1 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors text-sm"
+                            className="px-3 py-1 bg-vscode-button hover:bg-vscode-button-hover  transition-colors text-sm"
                           >
                             Save
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded transition-colors text-sm"
+                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700  transition-colors text-sm"
                           >
                             Cancel
                           </button>

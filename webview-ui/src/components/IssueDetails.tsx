@@ -150,7 +150,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-4">
             <span
-              className={`px-3 py-1 rounded text-sm font-medium ${
+              className={`px-3 py-1  text-sm font-medium ${
                 data.state === "open"
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
@@ -173,27 +173,27 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="flex gap-3">
           <button
             onClick={handleRefresh}
-            className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors"
+            className="px-4 py-2 bg-vscode-button hover:bg-vscode-button-hover  transition-colors"
           >
             Refresh
           </button>
           <button
             onClick={() => handleOpenExternal(data.html_url)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700  transition-colors"
           >
             Open in Gitea
           </button>
           {data.state === "open" ? (
             <button
               onClick={handleCloseIssue}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700  transition-colors"
             >
               Close Issue
             </button>
           ) : (
             <button
               onClick={handleReopenIssue}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors"
+              className="px-4 py-2 bg-green-600 hover:bg-green-700  transition-colors"
             >
               Reopen Issue
             </button>
@@ -203,7 +203,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
       <div className="flex flex-col gap-6">
         <div className="grid grid-cols-3 gap-6">
-          <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5 ">
+          <div className="flex-1 -lg p-4 bg-gray-50 bg-opacity-5 ">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold">Labels</h3>
@@ -219,7 +219,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                   {data.labels.map((label, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 rounded text-sm font-medium"
+                      className="px-3 py-1  text-sm font-medium"
                       style={{
                         backgroundColor: `#${label.color}`,
                         color: "#000",
@@ -236,7 +236,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               )}
             </div>
           </div>
-          <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5">
+          <div className="flex-1 -lg p-4 bg-gray-50 bg-opacity-5">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold">Assignees</h3>
@@ -254,7 +254,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                       <img
                         src={assignee.avatar_url}
                         alt={assignee.login}
-                        className="w-6 h-6 rounded-full"
+                        className="w-6 h-6 -full"
                       />
                       <span className="text-sm font-medium">
                         {assignee.login}
@@ -272,13 +272,13 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               )}
             </div>
           </div>
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4">
             <h3 className="text-lg font-semibold mb-3">Author</h3>
             <div className="flex items-center gap-3">
               <img
                 src={data.user.avatar_url}
                 alt={data.user.login}
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 -full"
               />
               <div>
                 <div className="font-medium">{data.user.login}</div>
@@ -287,7 +287,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           </div>
         </div>
         <div className="">
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 ">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4 ">
             <h3 className="text-lg font-semibold mb-3">Description</h3>
             {data.body ? (
               <div className="prose prose-invert max-w-none">
@@ -301,7 +301,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               </p>
             )}
           </div>
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 mt-4">
+          <div className="bg-gray-50 bg-opacity-5 -lg p-4 mt-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>
             <Timeline
               events={timelineData}
