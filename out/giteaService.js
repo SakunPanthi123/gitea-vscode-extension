@@ -181,6 +181,42 @@ class GiteaService {
             throw new Error(`Failed to edit comment: ${error.message}`);
         }
     }
+    async closeIssue(issueNumber) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/issues/${issueNumber}`, { state: "closed" });
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to close issue: ${error.message}`);
+        }
+    }
+    async reopenIssue(issueNumber) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/issues/${issueNumber}`, { state: "open" });
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to reopen issue: ${error.message}`);
+        }
+    }
+    async closePullRequest(pullRequestNumber) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/pulls/${pullRequestNumber}`, { state: "closed" });
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to close pull request: ${error.message}`);
+        }
+    }
+    async reopenPullRequest(pullRequestNumber) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/pulls/${pullRequestNumber}`, { state: "open" });
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to reopen pull request: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map

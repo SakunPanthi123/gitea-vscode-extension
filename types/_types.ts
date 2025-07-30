@@ -148,3 +148,11 @@ export interface CommentCreateRequest {
 export interface CommentEditRequest {
   body: string;
 }
+
+export interface IssueStateChangeRequest {
+  state: "open" | "closed";
+}
+
+export interface PullRequestStateChangeRequest {
+  state: "open" | "closed";
+}
