@@ -149,6 +149,36 @@ export class ReactWebviewProvider {
             vscode.window.showErrorMessage(`Failed to edit comment: ${error}`);
           }
           break;
+        case "closePullRequest":
+          try {
+            const updatedPR = await this.giteaService.closePullRequest(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            vscode.window.showInformationMessage(
+              `Pull Request #${pullRequest.number} closed successfully`
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to close pull request: ${error}`
+            );
+          }
+          break;
+        case "reopenPullRequest":
+          try {
+            const updatedPR = await this.giteaService.reopenPullRequest(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            vscode.window.showInformationMessage(
+              `Pull Request #${pullRequest.number} reopened successfully`
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to reopen pull request: ${error}`
+            );
+          }
+          break;
       }
     });
   }
@@ -255,6 +285,38 @@ export class ReactWebviewProvider {
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to edit comment: ${error}`);
+          }
+          break;
+        case "closeIssue":
+          try {
+            const updatedIssue = await this.giteaService.closeIssue(
+              issue.number
+            );
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+            vscode.window.showInformationMessage(
+              `Issue #${issue.number} closed successfully`
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to close issue: ${error}`);
+          }
+          break;
+        case "reopenIssue":
+          try {
+            const updatedIssue = await this.giteaService.reopenIssue(
+              issue.number
+            );
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+            vscode.window.showInformationMessage(
+              `Issue #${issue.number} reopened successfully`
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to reopen issue: ${error}`);
           }
           break;
       }

@@ -8,6 +8,8 @@ import {
   Comment,
   CommentCreateRequest,
   CommentEditRequest,
+  IssueStateChangeRequest,
+  PullRequestStateChangeRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -191,6 +193,54 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to edit comment: ${error.message}`);
+    }
+  }
+
+  async closeIssue(issueNumber: number): Promise<Issue> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/issues/${issueNumber}`,
+        { state: "closed" } as IssueStateChangeRequest
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to close issue: ${error.message}`);
+    }
+  }
+
+  async reopenIssue(issueNumber: number): Promise<Issue> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/issues/${issueNumber}`,
+        { state: "open" } as IssueStateChangeRequest
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to reopen issue: ${error.message}`);
+    }
+  }
+
+  async closePullRequest(pullRequestNumber: number): Promise<PullRequest> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/pulls/${pullRequestNumber}`,
+        { state: "closed" } as PullRequestStateChangeRequest
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to close pull request: ${error.message}`);
+    }
+  }
+
+  async reopenPullRequest(pullRequestNumber: number): Promise<PullRequest> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/pulls/${pullRequestNumber}`,
+        { state: "open" } as PullRequestStateChangeRequest
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to reopen pull request: ${error.message}`);
     }
   }
 }

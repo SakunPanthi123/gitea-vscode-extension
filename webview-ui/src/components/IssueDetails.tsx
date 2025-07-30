@@ -40,6 +40,10 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "commentEdited") {
         // Refresh timeline when comment is edited
         onMessage("getTimeline", { issueNumber: data.number });
+      } else if (message.type === "updateData") {
+        // Data updated (e.g., issue closed/reopened)
+        // The parent will handle the data update, we just need to refresh
+        onMessage("refresh");
       }
     };
 
@@ -60,6 +64,14 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const handleAddComment = (comment: string) => {
     setIsAddingComment(true);
     onMessage("addComment", { issueNumber: data.number, body: comment });
+  };
+
+  const handleCloseIssue = () => {
+    onMessage("closeIssue");
+  };
+
+  const handleReopenIssue = () => {
+    onMessage("reopenIssue");
   };
 
   const formatDate = (dateString: string) => {
@@ -105,6 +117,21 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           >
             Open in Gitea
           </button>
+          {data.state === "open" ? (
+            <button
+              onClick={handleCloseIssue}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+            >
+              Close Issue
+            </button>
+          ) : (
+            <button
+              onClick={handleReopenIssue}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors"
+            >
+              Reopen Issue
+            </button>
+          )}
         </div>
       </div>
 

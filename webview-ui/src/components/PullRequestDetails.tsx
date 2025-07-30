@@ -40,6 +40,10 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "commentEdited") {
         // Refresh timeline when comment is edited
         onMessage("getTimeline", { pullRequestNumber: data.number });
+      } else if (message.type === "updateData") {
+        // Data updated (e.g., pull request closed/reopened)
+        // The parent will handle the data update, we just need to refresh
+        onMessage("refresh");
       }
     };
 
@@ -60,6 +64,14 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const handleAddComment = (comment: string) => {
     setIsAddingComment(true);
     onMessage("addComment", { pullRequestNumber: data.number, body: comment });
+  };
+
+  const handleClosePullRequest = () => {
+    onMessage("closePullRequest");
+  };
+
+  const handleReopenPullRequest = () => {
+    onMessage("reopenPullRequest");
   };
 
   const formatDate = (dateString: string) => {
@@ -105,6 +117,21 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           >
             Open in Gitea
           </button>
+          {data.state === "open" ? (
+            <button
+              onClick={handleClosePullRequest}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+            >
+              Close Pull Request
+            </button>
+          ) : (
+            <button
+              onClick={handleReopenPullRequest}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors"
+            >
+              Reopen Pull Request
+            </button>
+          )}
         </div>
       </div>
 
