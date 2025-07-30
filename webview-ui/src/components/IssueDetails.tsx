@@ -37,6 +37,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "commentDeleted") {
         // Refresh timeline when comment is deleted
         onMessage("getTimeline", { issueNumber: data.number });
+      } else if (message.type === "commentEdited") {
+        // Refresh timeline when comment is edited
+        onMessage("getTimeline", { issueNumber: data.number });
       }
     };
 
@@ -165,6 +168,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               onMessage={onMessage}
               enableCommits={false}
               canDeleteComments={true}
+              canEditComments={true}
             />
           </div>
           <div className="mt-4">

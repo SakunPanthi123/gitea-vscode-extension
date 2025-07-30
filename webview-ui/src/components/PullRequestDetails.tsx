@@ -37,6 +37,9 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "commentDeleted") {
         // Refresh timeline when comment is deleted
         onMessage("getTimeline", { pullRequestNumber: data.number });
+      } else if (message.type === "commentEdited") {
+        // Refresh timeline when comment is edited
+        onMessage("getTimeline", { pullRequestNumber: data.number });
       }
     };
 
@@ -169,6 +172,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               onMessage={onMessage}
               enableCommits={true}
               canDeleteComments={true}
+              canEditComments={true}
             />
           </div>
           <div>

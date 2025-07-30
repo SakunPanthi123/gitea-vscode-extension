@@ -8,6 +8,7 @@ interface Props {
   onMessage?: (type: string, payload?: any) => void;
   enableCommits?: boolean; // New prop to control commit functionality
   canDeleteComments?: boolean; // New prop to control comment deletion
+  canEditComments?: boolean; // New prop to control comment editing
 }
 
 const Timeline: React.FC<Props> = ({
@@ -16,12 +17,15 @@ const Timeline: React.FC<Props> = ({
   onMessage,
   enableCommits = true,
   canDeleteComments = true,
+  canEditComments = true,
 }) => {
   const [commitDetails, setCommitDetails] = useState<
     Record<string, CommitDetails>
   >({});
   const [loadingCommits, setLoadingCommits] = useState<Set<string>>(new Set());
   const [deleteState, setDeleteState] = useState<boolean>(false);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editCommentText, setEditCommentText] = useState<string>("");
 
   // Extract commit IDs from pull_push events
   const extractCommitIds = (event: TimelineEvent): string[] => {
@@ -101,6 +105,24 @@ const Timeline: React.FC<Props> = ({
     if (onMessage) {
       onMessage("deleteComment", { commentId });
     }
+  };
+
+  const handleEditComment = (commentId: number, currentBody: string) => {
+    setEditingCommentId(commentId);
+    setEditCommentText(currentBody);
+  };
+
+  const handleSaveEdit = (commentId: number) => {
+    if (onMessage && editCommentText.trim()) {
+      onMessage("editComment", { commentId, body: editCommentText.trim() });
+      setEditingCommentId(null);
+      setEditCommentText("");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditCommentText("");
   };
 
   const formatDate = (dateString: string) => {
@@ -357,43 +379,55 @@ const Timeline: React.FC<Props> = ({
                       {formatDate(event.created_at)}
                     </span>
                   </div>
-                  {event.type === "comment" && canDeleteComments &&
-                  !deleteState ?
-                  (
-                    <button
-                      onClick={() => {
-                        setDeleteState(true)
-                      }}
-                      className="ml-2 px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
-                      title="Delete comment"
-                    >
-                      <Icons 
-                        name="trash"
-                      />
-                    </button>
-                  )
-                : event.type === "comment" && canDeleteComments && (
-                  <div className="flex gap-2.5">
-                    <button
-                      onClick={() => {
-                        handleDeleteComment(event.id);
-                        setDeleteState(false);
-                      }}
-                      className="ml-2 px-2 py-1 hover:bg-opacity-10 rounded transition-colors"
-                    >
-                      Confirm
-                    </button>
+                  {event.type === "comment" &&
+                  canDeleteComments &&
+                  !deleteState ? (
+                    <div className="flex gap-1">
+                      {canEditComments && (
+                        <button
+                          onClick={() =>
+                            handleEditComment(event.id, event.body)
+                          }
+                          className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
+                          title="Edit comment"
+                        >
+                          <Icons name="edit" />
+                        </button>
+                      )}
                       <button
-                      onClick={() => {
-                        setDeleteState(false)
-                      }}
-                      className="ml-2 px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover hover:bg-opacity-10 rounded transition-colors"
+                        onClick={() => {
+                          setDeleteState(true);
+                        }}
+                        className="px-2 py-1 text-gray-300 hover:bg-gray-400 hover:bg-opacity-10 rounded transition-colors"
+                        title="Delete comment"
                       >
-                      Cancel
+                        <Icons name="trash" />
                       </button>
-                  </div>
-                )
-                }
+                    </div>
+                  ) : (
+                    event.type === "comment" &&
+                    canDeleteComments && (
+                      <div className="flex gap-2.5">
+                        <button
+                          onClick={() => {
+                            handleDeleteComment(event.id);
+                            setDeleteState(false);
+                          }}
+                          className="ml-2 px-2 py-1 hover:bg-opacity-10 rounded transition-colors"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeleteState(false);
+                          }}
+                          className="ml-2 px-2 py-1 bg-vscode-button hover:bg-vscode-button-hover hover:bg-opacity-10 rounded transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )
+                  )}
                 </div>
 
                 {event.type === "label" && event.label && (
@@ -414,9 +448,33 @@ const Timeline: React.FC<Props> = ({
 
                 {shouldShowBody(event) && (
                   <div className="mt-2 p-3 bg-gray-50 bg-opacity-5 rounded border-l-2 border-gray-300 border-opacity-30">
-                    <div className="text-sm text-gray-300 whitespace-pre-wrap">
-                      {event.body}
-                    </div>
+                    {editingCommentId === event.id ? (
+                      <div className="space-y-3">
+                        <textarea
+                          value={editCommentText}
+                          onChange={(e) => setEditCommentText(e.target.value)}
+                          className="w-full p-2 rounded border border-gray-300 border-opacity-30 bg-vscode-input text-vscode-foreground resize-vertical min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSaveEdit(event.id)}
+                            className="px-3 py-1 bg-vscode-button hover:bg-vscode-button-hover rounded transition-colors text-sm"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded transition-colors text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-300 whitespace-pre-wrap">
+                        {event.body}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
