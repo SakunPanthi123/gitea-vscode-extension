@@ -179,35 +179,6 @@ export class ReactWebviewProvider {
             );
           }
           break;
-        case "getRepositoryLabels":
-          try {
-            const labels = await this.giteaService.getRepositoryLabels();
-            panel.webview.postMessage({
-              type: "repositoryLabels",
-              data: labels,
-            });
-          } catch (error) {
-            vscode.window.showErrorMessage(`Failed to fetch labels: ${error}`);
-          }
-          break;
-        case "updatePullRequestLabels":
-          try {
-            const updatedLabels =
-              await this.giteaService.replacePullRequestLabels(
-                pullRequest.number,
-                { labels: message.labelIds }
-              );
-            panel.webview.postMessage({
-              type: "labelsUpdated",
-              data: updatedLabels,
-            });
-            vscode.window.showInformationMessage(
-              "Pull request labels updated successfully"
-            );
-          } catch (error) {
-            vscode.window.showErrorMessage(`Failed to update labels: ${error}`);
-          }
-          break;
       }
     });
   }

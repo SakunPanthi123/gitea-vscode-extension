@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
 import CommentBox from "./CommentBox";
-import LabelPicker from "./LabelPicker";
-import { PullRequest, TimelineEvent, Label } from "./../../../types/_types";
+import { PullRequest, TimelineEvent } from "./../../../types/_types";
 
 interface Props {
   data: PullRequest;
@@ -16,17 +15,12 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   );
   const [isLoadingTimeline, setIsLoadingTimeline] = useState(!timeline);
   const [isAddingComment, setIsAddingComment] = useState(false);
-  const [availableLabels, setAvailableLabels] = useState<Label[]>([]);
-  const [isLoadingLabels, setIsLoadingLabels] = useState(false);
 
   useEffect(() => {
     if (!timeline) {
       // Request timeline data if not provided
       onMessage("getTimeline", { pullRequestNumber: data.number });
     }
-
-    // Request available labels
-    onMessage("getRepositoryLabels");
   }, [data.number, timeline, onMessage]);
 
   useEffect(() => {
@@ -49,12 +43,6 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "updateData") {
         // Data updated (e.g., pull request closed/reopened)
         // The parent will handle the data update, we just need to refresh
-        onMessage("refresh");
-      } else if (message.type === "repositoryLabels") {
-        setAvailableLabels(message.data);
-        setIsLoadingLabels(false);
-      } else if (message.type === "labelsUpdated") {
-        // Labels were updated, refresh the pull request data
         onMessage("refresh");
       }
     };
@@ -84,18 +72,6 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleReopenPullRequest = () => {
     onMessage("reopenPullRequest");
-  };
-
-  const handleLabelsChange = (newLabels: Label[]) => {
-    const labelIds = newLabels.map((label) => label.id);
-    onMessage("updatePullRequestLabels", { labelIds });
-  };
-
-  // Convert simplified PR labels to full Label objects when possible
-  const getCurrentLabels = (): Label[] => {
-    // Pull requests don't have labels by default in the interface, so return empty array
-    // This would need to be updated if PR labels are added to the PullRequest interface
-    return [];
   };
 
   const formatDate = (dateString: string) => {
@@ -160,8 +136,8 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
+        <div className="flex gap-6">
+          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 w-full">
             <h3 className="text-lg font-semibold mb-3">Branch Information</h3>
             <div className="flex items-center gap-2 text-sm">
               <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -184,35 +160,23 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               </div>
             )}
           </div>
-          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold">Labels</h3>
-              <LabelPicker
-                availableLabels={availableLabels}
-                currentLabels={getCurrentLabels()}
-                onLabelsChange={handleLabelsChange}
-                isLoading={isLoadingLabels}
-              />
-            </div>
-            <p className="text-sm text-gray-400 italic">No labels assigned</p>
-          </div>
-        </div>
 
-        <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-3">Author</h3>
-          <div className="flex items-center gap-3">
-            <img
-              src={data.user.avatar_url}
-              alt={data.user.login}
-              className="w-10 h-10 rounded-full"
-            />
-            <div>
-              <div className="font-medium">{data.user.login}</div>
-              <div className="text-sm text-gray-400">
-                Created {formatDate(data.created_at)}
-              </div>
-              <div className="text-sm text-gray-400">
-                Updated {formatDate(data.updated_at)}
+          <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4 w-full">
+            <h3 className="text-lg font-semibold mb-3">Author</h3>
+            <div className="flex items-center gap-3">
+              <img
+                src={data.user.avatar_url}
+                alt={data.user.login}
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <div className="font-medium">{data.user.login}</div>
+                <div className="text-sm text-gray-400">
+                  Created {formatDate(data.created_at)}
+                </div>
+                <div className="text-sm text-gray-400">
+                  Updated {formatDate(data.updated_at)}
+                </div>
               </div>
             </div>
           </div>

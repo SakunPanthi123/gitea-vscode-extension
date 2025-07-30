@@ -252,32 +252,6 @@ class GiteaService {
             throw new Error(`Failed to replace issue labels: ${error.message}`);
         }
     }
-    async addLabelsToPullRequest(pullRequestNumber, labels) {
-        try {
-            const response = await this.client.post(`/${this.getRepoPath()}/issues/${pullRequestNumber}/labels`, labels);
-            return response.data;
-        }
-        catch (error) {
-            throw new Error(`Failed to add labels to pull request: ${error.message}`);
-        }
-    }
-    async removeLabelFromPullRequest(pullRequestNumber, labelId) {
-        try {
-            await this.client.delete(`/${this.getRepoPath()}/issues/${pullRequestNumber}/labels/${labelId}`);
-        }
-        catch (error) {
-            throw new Error(`Failed to remove label from pull request: ${error.message}`);
-        }
-    }
-    async replacePullRequestLabels(pullRequestNumber, labels) {
-        try {
-            const response = await this.client.put(`/${this.getRepoPath()}/issues/${pullRequestNumber}/labels`, labels);
-            return response.data;
-        }
-        catch (error) {
-            throw new Error(`Failed to replace pull request labels: ${error.message}`);
-        }
-    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map
