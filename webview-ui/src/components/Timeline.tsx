@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { TimelineEvent, CommitDetails } from "./_types";
+import { TimelineEvent, CommitDetails } from "./../../../types/_types";
 
 interface Props {
   events: TimelineEvent[];

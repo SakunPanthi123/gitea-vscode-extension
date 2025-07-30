@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
-import { GiteaService, Issue } from './giteaService';
+import { GiteaService } from './giteaService';
+import { Issue } from '../types/_types';
+
 
 export class IssueProvider implements vscode.TreeDataProvider<IssueItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<IssueItem | undefined | null | void> = new vscode.EventEmitter<IssueItem | undefined | null | void>();

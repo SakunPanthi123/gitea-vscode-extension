@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { GiteaService, PullRequest } from './giteaService';
+import { GiteaService } from './giteaService';
+import { PullRequest } from '../types/_types';
 
 export class PullRequestProvider implements vscode.TreeDataProvider<PullRequestItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<PullRequestItem | undefined | null | void> = new vscode.EventEmitter<PullRequestItem | undefined | null | void>();

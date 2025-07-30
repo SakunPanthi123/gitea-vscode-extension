@@ -1,5 +1,5 @@
 import React from "react";
-import { PullRequest } from "./_types";
+import { PullRequest } from "./../../../types/_types";
 
 interface Props {
   data: PullRequest[];

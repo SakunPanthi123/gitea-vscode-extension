@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
-import { Issue, TimelineEvent } from "./_types";
+import { Issue, TimelineEvent } from "../../../types/_types";
 
 interface Props {
   data: Issue;

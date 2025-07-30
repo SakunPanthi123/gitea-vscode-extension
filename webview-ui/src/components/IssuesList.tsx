@@ -1,5 +1,5 @@
 import React from "react";
-import { Issue } from "./_types";
+import { Issue } from "./../../../types/_types";
 
 interface Props {
   data: Issue[];
