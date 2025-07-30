@@ -156,3 +156,7 @@ export interface IssueStateChangeRequest {
 export interface PullRequestStateChangeRequest {
   state: "open" | "closed";
 }
+
+export interface LabelRequest {
+  labels: (number | string)[];
+}

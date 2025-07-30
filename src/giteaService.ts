@@ -10,6 +10,8 @@ import {
   CommentEditRequest,
   IssueStateChangeRequest,
   PullRequestStateChangeRequest,
+  Label,
+  LabelRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -241,6 +243,105 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to reopen pull request: ${error.message}`);
+    }
+  }
+
+  async getRepositoryLabels(): Promise<Label[]> {
+    try {
+      const response = await this.client.get(`/${this.getRepoPath()}/labels`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to fetch repository labels: ${error.message}`);
+    }
+  }
+
+  async addLabelsToIssue(
+    issueNumber: number,
+    labels: LabelRequest
+  ): Promise<Label[]> {
+    try {
+      const response = await this.client.post(
+        `/${this.getRepoPath()}/issues/${issueNumber}/labels`,
+        labels
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to add labels to issue: ${error.message}`);
+    }
+  }
+
+  async removeLabelFromIssue(
+    issueNumber: number,
+    labelId: number
+  ): Promise<void> {
+    try {
+      await this.client.delete(
+        `/${this.getRepoPath()}/issues/${issueNumber}/labels/${labelId}`
+      );
+    } catch (error: any) {
+      throw new Error(`Failed to remove label from issue: ${error.message}`);
+    }
+  }
+
+  async replaceIssueLabels(
+    issueNumber: number,
+    labels: LabelRequest
+  ): Promise<Label[]> {
+    try {
+      const response = await this.client.put(
+        `/${this.getRepoPath()}/issues/${issueNumber}/labels`,
+        labels
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to replace issue labels: ${error.message}`);
+    }
+  }
+
+  async addLabelsToPullRequest(
+    pullRequestNumber: number,
+    labels: LabelRequest
+  ): Promise<Label[]> {
+    try {
+      const response = await this.client.post(
+        `/${this.getRepoPath()}/issues/${pullRequestNumber}/labels`,
+        labels
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to add labels to pull request: ${error.message}`);
+    }
+  }
+
+  async removeLabelFromPullRequest(
+    pullRequestNumber: number,
+    labelId: number
+  ): Promise<void> {
+    try {
+      await this.client.delete(
+        `/${this.getRepoPath()}/issues/${pullRequestNumber}/labels/${labelId}`
+      );
+    } catch (error: any) {
+      throw new Error(
+        `Failed to remove label from pull request: ${error.message}`
+      );
+    }
+  }
+
+  async replacePullRequestLabels(
+    pullRequestNumber: number,
+    labels: LabelRequest
+  ): Promise<Label[]> {
+    try {
+      const response = await this.client.put(
+        `/${this.getRepoPath()}/issues/${pullRequestNumber}/labels`,
+        labels
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        `Failed to replace pull request labels: ${error.message}`
+      );
     }
   }
 }

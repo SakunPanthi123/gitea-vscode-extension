@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./Timeline";
 import CommentBox from "./CommentBox";
-import { Issue, TimelineEvent } from "../../../types/_types";
+import LabelPicker from "./LabelPicker";
+import { Issue, TimelineEvent, Label } from "../../../types/_types";
 
 interface Props {
   data: Issue;
@@ -15,12 +16,17 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   );
   const [isLoadingTimeline, setIsLoadingTimeline] = useState(!timeline);
   const [isAddingComment, setIsAddingComment] = useState(false);
+  const [availableLabels, setAvailableLabels] = useState<Label[]>([]);
+  const [isLoadingLabels, setIsLoadingLabels] = useState(false);
 
   useEffect(() => {
     if (!timeline) {
       // Request timeline data if not provided
       onMessage("getTimeline", { issueNumber: data.number });
     }
+
+    // Request available labels
+    onMessage("getRepositoryLabels");
   }, [data.number, timeline, onMessage]);
 
   useEffect(() => {
@@ -43,6 +49,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "updateData") {
         // Data updated (e.g., issue closed/reopened)
         // The parent will handle the data update, we just need to refresh
+        onMessage("refresh");
+      } else if (message.type === "repositoryLabels") {
+        setAvailableLabels(message.data);
+        setIsLoadingLabels(false);
+      } else if (message.type === "labelsUpdated") {
+        // Labels were updated, refresh the issue data
         onMessage("refresh");
       }
     };
@@ -72,6 +84,38 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleReopenIssue = () => {
     onMessage("reopenIssue");
+  };
+
+  const handleLabelsChange = (newLabels: Label[]) => {
+    const labelIds = newLabels.map((label) => label.id);
+    onMessage("updateIssueLabels", { labelIds });
+  };
+
+  // Convert simplified issue labels to full Label objects when possible
+  const getCurrentLabels = (): Label[] => {
+    if (!data.labels) return [];
+
+    return data.labels.map((issueLabel) => {
+      // Try to find the full label from available labels
+      const fullLabel = availableLabels.find(
+        (availableLabel) => availableLabel.name === issueLabel.name
+      );
+
+      if (fullLabel) {
+        return fullLabel;
+      }
+
+      // Create a minimal Label object if not found
+      return {
+        id: -1, // Temporary ID
+        name: issueLabel.name,
+        color: issueLabel.color,
+        exclusive: false,
+        is_archived: false,
+        description: "",
+        url: "",
+      };
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -138,9 +182,17 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       <div className="flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-6">
           <div className="flex-1 rounded-lg p-4 bg-gray-50 bg-opacity-5 ">
-            {data.labels && data.labels.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Labels</h3>
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold">Labels</h3>
+                <LabelPicker
+                  availableLabels={availableLabels}
+                  currentLabels={getCurrentLabels()}
+                  onLabelsChange={handleLabelsChange}
+                  isLoading={isLoadingLabels}
+                />
+              </div>
+              {data.labels && data.labels.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {data.labels.map((label, index) => (
                     <span
@@ -155,8 +207,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-sm text-gray-400 italic">
+                  No labels assigned
+                </p>
+              )}
+            </div>
           </div>
           <div className="bg-gray-50 bg-opacity-5 rounded-lg p-4">
             <h3 className="text-lg font-semibold mb-3">Author</h3>
