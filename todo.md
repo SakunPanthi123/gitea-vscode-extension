@@ -4,11 +4,11 @@ In the future, we will add comments, release notes, npm watch mode for easier de
 
 Major and urgent:
 
-[]-This post request /markdown give HTML of sent markdown with images attached
-[]- show commit message in timeline not just 'added 1 commit'
-[]- Implement better ref label: 'Sakun referenced a pull request that will close this issue 2 days ago
+-[] This post request /markdown give HTML of sent markdown with images attached.
+-[x] show commit message in timeline not just 'added 1 commit'.
+-[] Implement better ref label: 'Sakun referenced a pull request that will close this issue 2 days ago.
 WIP: Feat Account Module #374' instead of 'Sakun comment ref 2 days ago' and make the ref label clickable to open the pull request in a new tab.
-[]- Implement add comment feature in the details webview for better.
+-[X] Implement add comment and delete comment feature in the details webview for better.
 
 Major and Future:
 
