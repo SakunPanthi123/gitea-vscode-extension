@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Icons } from "./Icons";
 
 interface Props {
@@ -22,27 +22,33 @@ const EditableText: React.FC<Props> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
-  const lastRenderedValue = useRef<string>("");
 
-  // Request markdown rendering when component mounts or value changes
+  // Only render markdown on mount if we don't have HTML yet
   useEffect(() => {
-    if (!isTitle && value && value.trim() !== "" && onRequestMarkdownRender) {
-      // Always request render if:
-      // 1. We don't have rendered HTML for this value, OR
-      // 2. The value has changed since last render
-      if (!renderedHtml || lastRenderedValue.current !== value) {
-        onRequestMarkdownRender(value);
-        lastRenderedValue.current = value;
-      }
+    if (
+      !isTitle &&
+      value &&
+      value.trim() !== "" &&
+      onRequestMarkdownRender &&
+      !renderedHtml
+    ) {
+      onRequestMarkdownRender(value);
     }
-  }, [value, isTitle, onRequestMarkdownRender, renderedHtml]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount
 
-  // Update tracking when we receive rendered HTML
+  // Request markdown when rendered HTML becomes empty (e.g., after refresh)
   useEffect(() => {
-    if (renderedHtml) {
-      lastRenderedValue.current = value;
+    if (
+      !isTitle &&
+      value &&
+      value.trim() !== "" &&
+      onRequestMarkdownRender &&
+      !renderedHtml
+    ) {
+      onRequestMarkdownRender(value);
     }
-  }, [renderedHtml, value]);
+  }, [renderedHtml]); 
 
   const handleEdit = () => {
     setEditValue(value);
@@ -52,6 +58,13 @@ const EditableText: React.FC<Props> = ({
   const handleSave = () => {
     if (editValue.trim() !== value.trim()) {
       onSave(editValue.trim());
+
+      // Request markdown rendering after 2 seconds of successful edit
+      if (!isTitle && onRequestMarkdownRender) {
+        setTimeout(() => {
+          onRequestMarkdownRender(editValue.trim());
+        }, 2000);
+      }
     }
     setIsEditing(false);
   };

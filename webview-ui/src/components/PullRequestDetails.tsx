@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
 import EditableText from "./ui/EditableText";
@@ -18,22 +18,16 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
     useState<string>("");
-  const lastBodyContent = useRef<string>("");
 
-  // Reset rendered HTML only when the actual body content changes
-  useEffect(() => {
-    if (data.body !== lastBodyContent.current) {
-      setRenderedDescriptionHtml("");
-      lastBodyContent.current = data.body || "";
-    }
-  }, [data.body]);
+  // No automatic clearing - only clear on explicit refresh
 
   useEffect(() => {
     if (!timeline) {
       // Request timeline data if not provided
       onMessage("getTimeline", { pullRequestNumber: data.number });
     }
-  }, [data.number, timeline, onMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.number, timeline]); // Removed onMessage from dependencies to prevent infinite refreshing
 
   useEffect(() => {
     // Listen for timeline updates
@@ -54,8 +48,8 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         onMessage("getTimeline", { pullRequestNumber: data.number });
       } else if (message.type === "updateData") {
         // Data updated (e.g., pull request closed/reopened)
-        // The parent will handle the data update, we just need to refresh
-        onMessage("refresh");
+        // The parent will handle the data update automatically - no refresh needed
+        // Removed onMessage("refresh") to prevent infinite loop
       } else if (message.type === "markdownRendered") {
         // Rendered markdown received
         setRenderedDescriptionHtml(message.data);
@@ -64,12 +58,16 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [data.number, onMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.number]); // Removed onMessage from dependencies to prevent infinite refreshing
 
   const handleRefresh = () => {
     onMessage("refresh");
     setIsLoadingTimeline(true);
     onMessage("getTimeline", { pullRequestNumber: data.number });
+
+    // Clear rendered HTML on explicit refresh to force re-rendering
+    setRenderedDescriptionHtml("");
   };
 
   const handleOpenExternal = (url: string) => {
