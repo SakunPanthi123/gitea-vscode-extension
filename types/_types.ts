@@ -176,3 +176,29 @@ export interface CreateIssueRequest {
   closed?: boolean;
   due_date?: string;
 }
+
+export interface EditIssueRequest {
+  title?: string;
+  body?: string;
+  assignee?: string;
+  assignees?: string[];
+  milestone?: number;
+  state?: string;
+  due_date?: string;
+  unset_due_date?: boolean;
+  ref?: string;
+}
+
+export interface EditPullRequestRequest {
+  title?: string;
+  body?: string;
+  assignee?: string;
+  assignees?: string[];
+  base?: string;
+  labels?: number[];
+  milestone?: number;
+  state?: string;
+  due_date?: string;
+  unset_due_date?: boolean;
+  allow_maintainer_edit?: boolean;
+}

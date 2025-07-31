@@ -181,6 +181,39 @@ export class ReactWebviewProvider {
             );
           }
           break;
+        case "editPullRequestTitle":
+          try {
+            const updatedPR = await this.giteaService.editPullRequest(
+              pullRequest.number,
+              { title: message.title }
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            panel.title = `PR #${pullRequest.number}: ${message.title}`;
+            vscode.window.showInformationMessage(
+              "Pull request title updated successfully"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to update pull request title: ${error}`
+            );
+          }
+          break;
+        case "editPullRequestDescription":
+          try {
+            const updatedPR = await this.giteaService.editPullRequest(
+              pullRequest.number,
+              { body: message.body }
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            vscode.window.showInformationMessage(
+              "Pull request description updated successfully"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to update pull request description: ${error}`
+            );
+          }
+          break;
       }
     });
   }
@@ -376,6 +409,45 @@ export class ReactWebviewProvider {
           } catch (error) {
             vscode.window.showErrorMessage(
               `Failed to update assignees: ${error}`
+            );
+          }
+          break;
+        case "editIssueTitle":
+          try {
+            const updatedIssue = await this.giteaService.editIssue(
+              issue.number,
+              { title: message.title }
+            );
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+            panel.title = `Issue #${issue.number}: ${message.title}`;
+            vscode.window.showInformationMessage(
+              "Issue title updated successfully"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to update issue title: ${error}`
+            );
+          }
+          break;
+        case "editIssueDescription":
+          try {
+            const updatedIssue = await this.giteaService.editIssue(
+              issue.number,
+              { body: message.body }
+            );
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+            vscode.window.showInformationMessage(
+              "Issue description updated successfully"
+            );
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to update issue description: ${error}`
             );
           }
           break;

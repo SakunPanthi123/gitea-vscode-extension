@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
+import EditableText from "./ui/EditableText";
 import { PullRequest, TimelineEvent } from "./../../../types/_types";
 
 interface Props {
@@ -74,6 +75,14 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     onMessage("reopenPullRequest");
   };
 
+  const handleEditTitle = (newTitle: string) => {
+    onMessage("editPullRequestTitle", { title: newTitle });
+  };
+
+  const handleEditDescription = (newDescription: string) => {
+    onMessage("editPullRequestDescription", { body: newDescription });
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
@@ -95,7 +104,14 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             <span className="text-lg text-gray-400">#{data.number}</span>
           </div>
 
-          <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
+          <div className="mb-4">
+            <EditableText
+              value={data.title}
+              onSave={handleEditTitle}
+              isTitle={true}
+              placeholder="Enter pull request title..."
+            />
+          </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400 mb-6">
             <span>By {data.user.login}</span>
@@ -184,17 +200,12 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
         <div className="bg-gray-50 bg-opacity-5 -lg p-4">
           <h3 className="text-lg font-semibold mb-3">Description</h3>
-          {data.body ? (
-            <div className="prose prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-gray-300">
-                {data.body}
-              </pre>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400 italic">
-              No description provided
-            </p>
-          )}
+          <EditableText
+            value={data.body || ""}
+            onSave={handleEditDescription}
+            isTitle={false}
+            placeholder="No description provided"
+          />
         </div>
 
         <div className="space-y-4">

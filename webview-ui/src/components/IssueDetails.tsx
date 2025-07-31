@@ -3,6 +3,7 @@ import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
 import LabelPicker from "./ui/LabelPicker";
 import AssigneePicker from "./ui/AssigneePicker";
+import EditableText from "./ui/EditableText";
 import { Issue, TimelineEvent, Label, User } from "../../../types/_types";
 
 interface Props {
@@ -108,6 +109,14 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     onMessage("updateIssueAssignees", { assignees: assigneeUsernames });
   };
 
+  const handleEditTitle = (newTitle: string) => {
+    onMessage("editIssueTitle", { title: newTitle });
+  };
+
+  const handleEditDescription = (newDescription: string) => {
+    onMessage("editIssueDescription", { body: newDescription });
+  };
+
   // Convert simplified issue labels to full Label objects when possible
   const getCurrentLabels = (): Label[] => {
     if (!data.labels) return [];
@@ -161,7 +170,14 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             <span className="text-lg text-gray-400">#{data.number}</span>
           </div>
 
-          <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
+          <div className="mb-4">
+            <EditableText
+              value={data.title}
+              onSave={handleEditTitle}
+              isTitle={true}
+              placeholder="Enter issue title..."
+            />
+          </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400 mb-6">
             <span>By {data.user.login}</span>
@@ -289,17 +305,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         <div className="">
           <div className="bg-gray-50 bg-opacity-5 -lg p-4 ">
             <h3 className="text-lg font-semibold mb-3">Description</h3>
-            {data.body ? (
-              <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-sm text-gray-300">
-                  {data.body}
-                </pre>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-400 italic">
-                No description provided
-              </p>
-            )}
+            <EditableText
+              value={data.body || ""}
+              onSave={handleEditDescription}
+              isTitle={false}
+              placeholder="No description provided"
+            />
           </div>
           <div className="bg-gray-50 bg-opacity-5 -lg p-4 mt-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>

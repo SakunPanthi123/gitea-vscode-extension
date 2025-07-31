@@ -15,6 +15,8 @@ import {
   User,
   AssigneeRequest,
   CreateIssueRequest,
+  EditIssueRequest,
+  EditPullRequestRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -336,6 +338,36 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to create issue: ${error.message}`);
+    }
+  }
+
+  async editIssue(
+    issueNumber: number,
+    editData: EditIssueRequest
+  ): Promise<Issue> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/issues/${issueNumber}`,
+        editData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to edit issue: ${error.message}`);
+    }
+  }
+
+  async editPullRequest(
+    pullRequestNumber: number,
+    editData: EditPullRequestRequest
+  ): Promise<PullRequest> {
+    try {
+      const response = await this.client.patch(
+        `/${this.getRepoPath()}/pulls/${pullRequestNumber}`,
+        editData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to edit pull request: ${error.message}`);
     }
   }
 }

@@ -279,6 +279,24 @@ class GiteaService {
             throw new Error(`Failed to create issue: ${error.message}`);
         }
     }
+    async editIssue(issueNumber, editData) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/issues/${issueNumber}`, editData);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to edit issue: ${error.message}`);
+        }
+    }
+    async editPullRequest(pullRequestNumber, editData) {
+        try {
+            const response = await this.client.patch(`/${this.getRepoPath()}/pulls/${pullRequestNumber}`, editData);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to edit pull request: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map
