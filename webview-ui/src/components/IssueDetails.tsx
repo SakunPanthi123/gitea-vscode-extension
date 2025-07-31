@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
 import LabelPicker from "./ui/LabelPicker";
@@ -22,6 +22,17 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
   const [availableAssignees, setAvailableAssignees] = useState<User[]>([]);
   const [isLoadingAssignees, setIsLoadingAssignees] = useState(false);
+  const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
+    useState<string>("");
+  const lastBodyContent = useRef<string>("");
+
+  // Reset rendered HTML only when the actual body content changes
+  useEffect(() => {
+    if (data.body !== lastBodyContent.current) {
+      setRenderedDescriptionHtml("");
+      lastBodyContent.current = data.body || "";
+    }
+  }, [data.body]);
 
   useEffect(() => {
     if (!timeline) {
@@ -69,6 +80,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "assigneesUpdated") {
         // Assignees were updated, refresh the issue data
         onMessage("refresh");
+      } else if (message.type === "markdownRendered") {
+        // Rendered markdown received
+        setRenderedDescriptionHtml(message.data);
       }
     };
 
@@ -116,6 +130,13 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const handleEditDescription = (newDescription: string) => {
     onMessage("editIssueDescription", { body: newDescription });
   };
+
+  const handleRequestMarkdownRender = useCallback(
+    (markdown: string) => {
+      onMessage("renderMarkdown", { markdown });
+    },
+    [onMessage]
+  );
 
   // Convert simplified issue labels to full Label objects when possible
   const getCurrentLabels = (): Label[] => {
@@ -308,6 +329,8 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             <EditableText
               value={data.body || ""}
               onSave={handleEditDescription}
+              onRequestMarkdownRender={handleRequestMarkdownRender}
+              renderedHtml={renderedDescriptionHtml}
               isTitle={false}
               placeholder="No description provided"
             />

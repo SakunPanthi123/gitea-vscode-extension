@@ -17,6 +17,8 @@ import {
   CreateIssueRequest,
   EditIssueRequest,
   EditPullRequestRequest,
+  MarkdownRenderRequest,
+  MarkdownRenderResponse,
   // @ts-ignore
 } from "../types/_types";
 
@@ -368,6 +370,15 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to edit pull request: ${error.message}`);
+    }
+  }
+
+  async renderMarkdown(markdownData: MarkdownRenderRequest): Promise<string> {
+    try {
+      const response = await this.client.post("/markdown", markdownData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to render markdown: ${error.message}`);
     }
   }
 }

@@ -202,3 +202,14 @@ export interface EditPullRequestRequest {
   unset_due_date?: boolean;
   allow_maintainer_edit?: boolean;
 }
+
+export interface MarkdownRenderRequest {
+  Text: string;
+  Mode?: string;
+  Context?: string;
+  Wiki?: boolean;
+}
+
+export interface MarkdownRenderResponse {
+  html: string;
+}

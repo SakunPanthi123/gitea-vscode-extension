@@ -214,6 +214,22 @@ export class ReactWebviewProvider {
             );
           }
           break;
+        case "renderMarkdown":
+          try {
+            const renderedHtml = await this.giteaService.renderMarkdown({
+              Text: message.markdown,
+              Mode: "markdown",
+            });
+            panel.webview.postMessage({
+              type: "markdownRendered",
+              data: renderedHtml,
+            });
+          } catch (error) {
+            // vscode.window.showErrorMessage(
+            //   `Failed to render markdown: ${error}`
+            // );
+          }
+          break;
       }
     });
   }
@@ -449,6 +465,22 @@ export class ReactWebviewProvider {
             vscode.window.showErrorMessage(
               `Failed to update issue description: ${error}`
             );
+          }
+          break;
+        case "renderMarkdown":
+          try {
+            const renderedHtml = await this.giteaService.renderMarkdown({
+              Text: message.markdown,
+              Mode: "markdown",
+            });
+            panel.webview.postMessage({
+              type: "markdownRendered",
+              data: renderedHtml,
+            });
+          } catch (error) {
+            // vscode.window.showErrorMessage(
+            //   `Failed to render markdown: ${error}`
+            // );
           }
           break;
       }

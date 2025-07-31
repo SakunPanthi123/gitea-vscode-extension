@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Icons } from "./Icons";
 
 interface Props {
   value: string;
   onSave: (newValue: string) => void;
+  onRequestMarkdownRender?: (markdown: string) => void;
+  renderedHtml?: string;
   isTitle?: boolean;
   className?: string;
   placeholder?: string;
@@ -12,12 +14,35 @@ interface Props {
 const EditableText: React.FC<Props> = ({
   value,
   onSave,
+  onRequestMarkdownRender,
+  renderedHtml,
   isTitle = false,
   className = "",
   placeholder = "Enter text...",
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
+  const lastRenderedValue = useRef<string>("");
+
+  // Request markdown rendering when component mounts or value changes
+  useEffect(() => {
+    if (!isTitle && value && value.trim() !== "" && onRequestMarkdownRender) {
+      // Always request render if:
+      // 1. We don't have rendered HTML for this value, OR
+      // 2. The value has changed since last render
+      if (!renderedHtml || lastRenderedValue.current !== value) {
+        onRequestMarkdownRender(value);
+        lastRenderedValue.current = value;
+      }
+    }
+  }, [value, isTitle, onRequestMarkdownRender, renderedHtml]);
+
+  // Update tracking when we receive rendered HTML
+  useEffect(() => {
+    if (renderedHtml) {
+      lastRenderedValue.current = value;
+    }
+  }, [renderedHtml, value]);
 
   const handleEdit = () => {
     setEditValue(value);
@@ -93,9 +118,19 @@ const EditableText: React.FC<Props> = ({
           <h1 className="text-3xl font-bold">{value}</h1>
         ) : value ? (
           <div className="prose prose-invert max-w-none">
-            <pre className="whitespace-pre-wrap text-sm text-gray-300">
-              {value}
-            </pre>
+            {renderedHtml ? (
+              <div
+                className="rendered-markdown text-sm text-gray-300"
+                dangerouslySetInnerHTML={{ __html: renderedHtml }}
+                style={{
+                  lineHeight: "1.6",
+                }}
+              />
+            ) : (
+              <pre className="whitespace-pre-wrap text-sm text-gray-300">
+                {value}
+              </pre>
+            )}
           </div>
         ) : (
           <p className="text-sm text-gray-400 italic">{placeholder}</p>

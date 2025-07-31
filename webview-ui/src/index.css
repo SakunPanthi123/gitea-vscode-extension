@@ -17,3 +17,116 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Markdown-specific styles */
+.rendered-markdown {
+  color: var(--vscode-foreground);
+}
+
+.rendered-markdown h1,
+.rendered-markdown h2,
+.rendered-markdown h3,
+.rendered-markdown h4,
+.rendered-markdown h5,
+.rendered-markdown h6 {
+  color: var(--vscode-foreground);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.rendered-markdown h1 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  padding-bottom: 0.3em;
+}
+
+.rendered-markdown h2 {
+  font-size: 1.3em;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  padding-bottom: 0.3em;
+}
+
+.rendered-markdown p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+.rendered-markdown ul,
+.rendered-markdown ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.rendered-markdown li {
+  margin-bottom: 0.25em;
+}
+
+.rendered-markdown blockquote {
+  border-left: 4px solid var(--vscode-textBlockQuote-border);
+  background-color: var(--vscode-textBlockQuote-background);
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  color: var(--vscode-textPreformat-foreground);
+}
+
+.rendered-markdown code {
+  background-color: var(--vscode-textCodeBlock-background);
+  color: var(--vscode-textPreformat-foreground);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.rendered-markdown pre {
+  background-color: var(--vscode-textCodeBlock-background);
+  color: var(--vscode-textPreformat-foreground);
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.rendered-markdown pre code {
+  background: none;
+  padding: 0;
+}
+
+.rendered-markdown a {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+}
+
+.rendered-markdown a:hover {
+  color: var(--vscode-textLink-activeForeground);
+  text-decoration: underline;
+}
+
+.rendered-markdown table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.rendered-markdown th,
+.rendered-markdown td {
+  border: 1px solid var(--vscode-panel-border);
+  padding: 0.5em;
+  text-align: left;
+}
+
+.rendered-markdown th {
+  background-color: var(--vscode-editor-background);
+  font-weight: 600;
+}
+
+.rendered-markdown img {
+  max-width: 100%;
+  height: auto;
+}
+
+.rendered-markdown hr {
+  border: none;
+  border-top: 1px solid var(--vscode-panel-border);
+  margin: 2em 0;
+}

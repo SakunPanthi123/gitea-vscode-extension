@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
 import EditableText from "./ui/EditableText";
@@ -16,6 +16,17 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   );
   const [isLoadingTimeline, setIsLoadingTimeline] = useState(!timeline);
   const [isAddingComment, setIsAddingComment] = useState(false);
+  const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
+    useState<string>("");
+  const lastBodyContent = useRef<string>("");
+
+  // Reset rendered HTML only when the actual body content changes
+  useEffect(() => {
+    if (data.body !== lastBodyContent.current) {
+      setRenderedDescriptionHtml("");
+      lastBodyContent.current = data.body || "";
+    }
+  }, [data.body]);
 
   useEffect(() => {
     if (!timeline) {
@@ -45,6 +56,9 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         // Data updated (e.g., pull request closed/reopened)
         // The parent will handle the data update, we just need to refresh
         onMessage("refresh");
+      } else if (message.type === "markdownRendered") {
+        // Rendered markdown received
+        setRenderedDescriptionHtml(message.data);
       }
     };
 
@@ -82,6 +96,13 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const handleEditDescription = (newDescription: string) => {
     onMessage("editPullRequestDescription", { body: newDescription });
   };
+
+  const handleRequestMarkdownRender = useCallback(
+    (markdown: string) => {
+      onMessage("renderMarkdown", { markdown });
+    },
+    [onMessage]
+  );
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
@@ -203,6 +224,8 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           <EditableText
             value={data.body || ""}
             onSave={handleEditDescription}
+            onRequestMarkdownRender={handleRequestMarkdownRender}
+            renderedHtml={renderedDescriptionHtml}
             isTitle={false}
             placeholder="No description provided"
           />

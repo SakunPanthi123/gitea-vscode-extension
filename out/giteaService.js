@@ -297,6 +297,15 @@ class GiteaService {
             throw new Error(`Failed to edit pull request: ${error.message}`);
         }
     }
+    async renderMarkdown(markdownData) {
+        try {
+            const response = await this.client.post("/markdown", markdownData);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to render markdown: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map
