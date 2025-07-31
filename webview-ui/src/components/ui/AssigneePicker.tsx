@@ -55,11 +55,11 @@ const AssigneePicker: React.FC<Props> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
         className="flex items-center gap-2 px-3 py-2 bg-vscode-button hover:bg-vscode-button-hover  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <span>👤</span>
         <span>Assignees ({currentAssignees.length})</span>
         <span
           className={`transform transition-transform ${
@@ -91,7 +91,11 @@ const AssigneePicker: React.FC<Props> = ({
               filteredAssignees.map((assignee) => (
                 <div
                   key={assignee.id}
-                  onClick={() => toggleAssignee(assignee)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleAssignee(assignee);
+                  }}
                   className="flex items-center gap-2 p-2 hover:bg-gray-100 hover:bg-opacity-10 cursor-pointer"
                 >
                   <input

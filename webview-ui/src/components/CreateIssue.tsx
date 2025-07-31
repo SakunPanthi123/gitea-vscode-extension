@@ -104,6 +104,7 @@ const CreateIssue: React.FC<Props> = ({ data, onMessage }) => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Create New Issue</h1>
         <button
+          type="button"
           onClick={handleCancel}
           className="px-4 py-2 bg-gray-600 hover:bg-gray-700 transition-colors"
           disabled={isSubmitting}

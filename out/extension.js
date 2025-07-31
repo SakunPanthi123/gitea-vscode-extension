@@ -41,62 +41,62 @@ const pullRequestProvider_1 = require("./pullRequestProvider");
 const issueProvider_1 = require("./issueProvider");
 const reactWebviewProvider_1 = require("./reactWebviewProvider");
 function activate(context) {
-    console.log('Gitea Integration (React) extension is now active!');
+    console.log("Gitea Integration (React) extension is now active!");
     const giteaService = new giteaService_1.GiteaService();
     // Create providers
     const pullRequestProvider = new pullRequestProvider_1.PullRequestProvider(giteaService);
     const issueProvider = new issueProvider_1.IssueProvider(giteaService);
     const reactWebviewProvider = new reactWebviewProvider_1.ReactWebviewProvider(context.extensionUri, giteaService, issueProvider);
     // Register tree data providers
-    vscode.window.createTreeView('giteaPullRequests', {
+    vscode.window.createTreeView("giteaPullRequests", {
         treeDataProvider: pullRequestProvider,
-        showCollapseAll: true
+        showCollapseAll: true,
     });
-    vscode.window.createTreeView('giteaIssues', {
+    vscode.window.createTreeView("giteaIssues", {
         treeDataProvider: issueProvider,
-        showCollapseAll: true
+        showCollapseAll: true,
     });
     // Set context to show views
-    vscode.commands.executeCommand('setContext', 'giteaPullRequestsVisible', true);
-    vscode.commands.executeCommand('setContext', 'giteaIssuesVisible', true);
+    vscode.commands.executeCommand("setContext", "giteaPullRequestsVisible", true);
+    vscode.commands.executeCommand("setContext", "giteaIssuesVisible", true);
     // Register commands
-    const viewPullRequestsCommand = vscode.commands.registerCommand('gitea.viewPullRequests', async () => {
+    const viewPullRequestsCommand = vscode.commands.registerCommand("gitea.viewPullRequests", async () => {
         await reactWebviewProvider.showPullRequestsList();
     });
-    const viewIssuesCommand = vscode.commands.registerCommand('gitea.viewIssues', async () => {
+    const viewIssuesCommand = vscode.commands.registerCommand("gitea.viewIssues", async () => {
         await reactWebviewProvider.showIssuesList();
     });
-    const refreshPullRequestsCommand = vscode.commands.registerCommand('gitea.refreshPullRequests', async () => {
+    const refreshPullRequestsCommand = vscode.commands.registerCommand("gitea.refreshPullRequests", async () => {
         try {
             pullRequestProvider.refresh();
-            vscode.window.showInformationMessage('Pull requests refreshed successfully!');
+            vscode.window.showInformationMessage("Pull requests refreshed successfully!");
         }
         catch (error) {
             // vscode.window.showErrorMessage(`Failed to refresh pull requests: ${error}`);
         }
     });
-    const refreshIssuesCommand = vscode.commands.registerCommand('gitea.refreshIssues', async () => {
+    const refreshIssuesCommand = vscode.commands.registerCommand("gitea.refreshIssues", async () => {
         try {
             issueProvider.refresh();
-            vscode.window.showInformationMessage('Issues refreshed successfully!');
+            vscode.window.showInformationMessage("Issues refreshed successfully!");
         }
         catch (error) {
             // vscode.window.showErrorMessage(`Failed to refresh issues: ${error}`);
         }
     });
-    const showPullRequestDetailsCommand = vscode.commands.registerCommand('gitea.showPullRequestDetails', async (pullRequest) => {
+    const showPullRequestDetailsCommand = vscode.commands.registerCommand("gitea.showPullRequestDetails", async (pullRequest) => {
         await reactWebviewProvider.showPullRequestDetails(pullRequest);
     });
-    const showIssueDetailsCommand = vscode.commands.registerCommand('gitea.showIssueDetails', async (issue) => {
+    const showIssueDetailsCommand = vscode.commands.registerCommand("gitea.showIssueDetails", async (issue) => {
         await reactWebviewProvider.showIssueDetails(issue);
     });
-    const listAllPullRequestsCommand = vscode.commands.registerCommand('gitea.listAllPullRequests', async () => {
+    const listAllPullRequestsCommand = vscode.commands.registerCommand("gitea.listAllPullRequests", async () => {
         await reactWebviewProvider.showPullRequestsList();
     });
-    const listAllIssuesCommand = vscode.commands.registerCommand('gitea.listAllIssues', async () => {
+    const listAllIssuesCommand = vscode.commands.registerCommand("gitea.listAllIssues", async () => {
         await reactWebviewProvider.showIssuesList();
     });
-    const createIssueCommand = vscode.commands.registerCommand('gitea.createIssue', async () => {
+    const createIssueCommand = vscode.commands.registerCommand("gitea.createIssue", async () => {
         await reactWebviewProvider.showCreateIssue();
     });
     // Add all commands to subscriptions

@@ -66,11 +66,11 @@ const LabelPicker: React.FC<Props> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
         className="flex items-center gap-2 px-3 py-2 bg-vscode-button hover:bg-vscode-button-hover  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <span>🏷️</span>
         <span>Labels ({currentLabels.length})</span>
         <span
           className={`transform transition-transform ${
@@ -102,7 +102,11 @@ const LabelPicker: React.FC<Props> = ({
               filteredLabels.map((label) => (
                 <div
                   key={label.id}
-                  onClick={() => toggleLabel(label)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleLabel(label);
+                  }}
                   className="flex items-center gap-2 p-2 hover:bg-gray-100 hover:bg-opacity-10 cursor-pointer"
                 >
                   <input
