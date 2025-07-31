@@ -59,7 +59,7 @@ const EditableText: React.FC<Props> = ({
           />
         ) : (
           <textarea
-            rows={20}
+            rows={14}
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
