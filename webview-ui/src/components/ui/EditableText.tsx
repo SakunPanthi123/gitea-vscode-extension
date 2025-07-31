@@ -53,12 +53,13 @@ const EditableText: React.FC<Props> = ({
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full p-2 text-3xl font-bold border border-gray-300 border-opacity-30 bg-vscode-input text-vscode-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 text-xl font-bold border border-gray-300 border-opacity-30 bg-vscode-input text-vscode-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
             autoFocus
             placeholder={placeholder}
           />
         ) : (
           <textarea
+            rows={20}
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
