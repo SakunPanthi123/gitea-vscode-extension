@@ -46,7 +46,7 @@ function activate(context) {
     // Create providers
     const pullRequestProvider = new pullRequestProvider_1.PullRequestProvider(giteaService);
     const issueProvider = new issueProvider_1.IssueProvider(giteaService);
-    const reactWebviewProvider = new reactWebviewProvider_1.ReactWebviewProvider(context.extensionUri, giteaService);
+    const reactWebviewProvider = new reactWebviewProvider_1.ReactWebviewProvider(context.extensionUri, giteaService, issueProvider);
     // Register tree data providers
     vscode.window.createTreeView('giteaPullRequests', {
         treeDataProvider: pullRequestProvider,
@@ -96,8 +96,11 @@ function activate(context) {
     const listAllIssuesCommand = vscode.commands.registerCommand('gitea.listAllIssues', async () => {
         await reactWebviewProvider.showIssuesList();
     });
+    const createIssueCommand = vscode.commands.registerCommand('gitea.createIssue', async () => {
+        await reactWebviewProvider.showCreateIssue();
+    });
     // Add all commands to subscriptions
-    context.subscriptions.push(viewPullRequestsCommand, viewIssuesCommand, refreshPullRequestsCommand, refreshIssuesCommand, showPullRequestDetailsCommand, showIssueDetailsCommand, listAllPullRequestsCommand, listAllIssuesCommand);
+    context.subscriptions.push(viewPullRequestsCommand, viewIssuesCommand, refreshPullRequestsCommand, refreshIssuesCommand, showPullRequestDetailsCommand, showIssueDetailsCommand, listAllPullRequestsCommand, listAllIssuesCommand, createIssueCommand);
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

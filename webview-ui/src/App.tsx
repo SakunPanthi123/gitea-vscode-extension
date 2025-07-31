@@ -4,6 +4,7 @@ import IssuesList from "./components/IssuesList";
 import PullRequestDetails from "./components/PullRequestDetails";
 import IssueDetails from "./components/IssueDetails";
 import CommitDetails from "./components/ui/CommitDetails";
+import CreateIssue from "./components/CreateIssue";
 import "./App.css";
 
 declare global {
@@ -49,6 +50,8 @@ function App() {
         return <PullRequestDetails data={data} onMessage={sendMessage} />;
       case "issue":
         return <IssueDetails data={data} onMessage={sendMessage} />;
+      case "create-issue":
+        return <CreateIssue data={data} onMessage={sendMessage} />;
       case "commit":
         return <CommitDetails data={data} onMessage={sendMessage} />;
       default:

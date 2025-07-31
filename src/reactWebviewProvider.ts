@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { GiteaService } from "./giteaService";
 import { CommitDetails, Issue, PullRequest } from "../types/_types";
+import { IssueProvider } from "./issueProvider";
 
 interface AssetManifest {
   files: {
@@ -20,7 +21,8 @@ export class ReactWebviewProvider {
 
   constructor(
     private readonly extensionUri: vscode.Uri,
-    private readonly giteaService: GiteaService
+    private readonly giteaService: GiteaService,
+    private readonly issueProvider?: IssueProvider
   ) {}
 
   public async showPullRequestDetails(pullRequest: PullRequest) {
@@ -481,6 +483,83 @@ export class ReactWebviewProvider {
             //   `Failed to refresh issues: ${error}`
             // );
           }
+          break;
+      }
+    });
+  }
+
+  public async showCreateIssue() {
+    const panel = vscode.window.createWebviewPanel(
+      ReactWebviewProvider.viewType,
+      "Create New Issue",
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [
+          vscode.Uri.joinPath(this.extensionUri, "webview-ui", "build"),
+        ],
+      }
+    );
+
+    try {
+      // Fetch initial data needed for creating issues (labels, assignees)
+      const [labels, assignees] = await Promise.all([
+        this.giteaService.getRepositoryLabels(),
+        this.giteaService.getRepositoryAssignees(),
+      ]);
+
+      const initialData = { labels, assignees };
+      panel.webview.html = this.getWebviewContent(
+        panel.webview,
+        "create-issue",
+        initialData
+      );
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        `Failed to load create issue form: ${error}`
+      );
+      panel.webview.html = this.getErrorContent(
+        panel.webview,
+        "Failed to load create issue form"
+      );
+    }
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "createIssue":
+          try {
+            const issueData = message.data;
+            const newIssue = await this.giteaService.createIssue(issueData);
+            panel.webview.postMessage({
+              type: "issueCreated",
+              data: newIssue,
+            });
+            vscode.window.showInformationMessage(
+              `Issue #${newIssue.number} created successfully: ${newIssue.title}`
+            );
+            // Refresh the issue provider if available
+            if (this.issueProvider) {
+              this.issueProvider.refresh();
+            }
+            // Close the create issue panel after successful creation
+            panel.dispose();
+            // Show the newly created issue details
+            this.showIssueDetails(newIssue);
+          } catch (error) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(
+              `Failed to create issue: ${errorMessage}`
+            );
+            panel.webview.postMessage({
+              type: "createIssueError",
+              error: errorMessage,
+            });
+          }
+          break;
+        case "cancel":
+          panel.dispose();
           break;
       }
     });

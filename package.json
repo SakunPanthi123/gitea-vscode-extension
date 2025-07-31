@@ -67,9 +67,15 @@
       },
       {
         "command": "gitea.listAllIssues",
-        "title": "List All Issues", 
+        "title": "List All Issues",
         "category": "Gitea",
         "icon": "$(list-unordered)"
+      },
+      {
+        "command": "gitea.createIssue",
+        "title": "Create Issue",
+        "category": "Gitea",
+        "icon": "$(add)"
       }
     ],
     "views": {
@@ -108,12 +114,17 @@
           "group": "navigation"
         },
         {
-          "command": "gitea.refreshIssues",  
+          "command": "gitea.refreshIssues",
           "when": "view == giteaIssues",
           "group": "navigation"
         },
         {
           "command": "gitea.listAllIssues",
+          "when": "view == giteaIssues",
+          "group": "navigation"
+        },
+        {
+          "command": "gitea.createIssue",
           "when": "view == giteaIssues",
           "group": "navigation"
         }

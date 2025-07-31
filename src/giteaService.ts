@@ -14,6 +14,7 @@ import {
   LabelRequest,
   User,
   AssigneeRequest,
+  CreateIssueRequest,
   // @ts-ignore
 } from "../types/_types";
 
@@ -323,6 +324,18 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to update issue assignees: ${error.message}`);
+    }
+  }
+
+  async createIssue(issueData: CreateIssueRequest): Promise<Issue> {
+    try {
+      const response = await this.client.post(
+        `/${this.getRepoPath()}/issues`,
+        issueData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to create issue: ${error.message}`);
     }
   }
 }

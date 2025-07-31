@@ -270,6 +270,15 @@ class GiteaService {
             throw new Error(`Failed to update issue assignees: ${error.message}`);
         }
     }
+    async createIssue(issueData) {
+        try {
+            const response = await this.client.post(`/${this.getRepoPath()}/issues`, issueData);
+            return response.data;
+        }
+        catch (error) {
+            throw new Error(`Failed to create issue: ${error.message}`);
+        }
+    }
 }
 exports.GiteaService = GiteaService;
 //# sourceMappingURL=giteaService.js.map

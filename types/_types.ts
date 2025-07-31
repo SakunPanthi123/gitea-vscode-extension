@@ -166,3 +166,13 @@ export interface LabelRequest {
 export interface AssigneeRequest {
   assignees: string[];
 }
+
+export interface CreateIssueRequest {
+  title: string;
+  body?: string;
+  assignees?: string[];
+  labels?: number[];
+  milestone?: number;
+  closed?: boolean;
+  due_date?: string;
+}
