@@ -1,3 +1,5 @@
+# Change Log
+
 ## [1.1.0] - 2025-07-31
 
 ### Added
@@ -17,7 +19,7 @@
 - Prevented accidental form submission when interacting with label and assignee pickers
 - Improved event handling in dropdown components to prevent event bubbling
 
-## [1.0.0 to 1.0.9] - Previous releases
+## [1.0.9] - Previous releases
 
 ### Added
 

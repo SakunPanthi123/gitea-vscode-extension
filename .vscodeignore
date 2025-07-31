@@ -11,6 +11,7 @@ vsc-extension-quickstart.md
 **/*.md
 !README.md
 !USAGE.md
+!CHANGELOG.md
 out/test/**
 
 # Node modules of webview-ui
@@ -30,7 +31,6 @@ webview-ui/.gitignore
 eslint.config.mjs
 postcss.config.js
 tailwind.config.js
-CHANGELOG.md
 
 # Keep only the built webview-ui
 !webview-ui/build/**
