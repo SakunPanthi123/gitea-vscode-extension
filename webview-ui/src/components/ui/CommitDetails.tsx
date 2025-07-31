@@ -1,5 +1,5 @@
 import React from "react";
-import { CommitDetails as CommitDetailsType } from "../../../types/_types";
+import { CommitDetails as CommitDetailsType } from "../../../../types/_types";
 
 interface Props {
   data: CommitDetailsType;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Label } from "../../../types/_types";
+import { Label } from "../../../../types/_types";
 
 interface Props {
   availableLabels: Label[];

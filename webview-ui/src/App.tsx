@@ -3,7 +3,7 @@ import PullRequestsList from "./components/PullRequestsList";
 import IssuesList from "./components/IssuesList";
 import PullRequestDetails from "./components/PullRequestDetails";
 import IssueDetails from "./components/IssueDetails";
-import CommitDetails from "./components/CommitDetails";
+import CommitDetails from "./components/ui/CommitDetails";
 import "./App.css";
 
 declare global {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Timeline from "./Timeline";
-import CommentBox from "./CommentBox";
-import LabelPicker from "./LabelPicker";
-import AssigneePicker from "./AssigneePicker";
+import Timeline from "./ui/Timeline";
+import CommentBox from "./ui/CommentBox";
+import LabelPicker from "./ui/LabelPicker";
+import AssigneePicker from "./ui/AssigneePicker";
 import { Issue, TimelineEvent, Label, User } from "../../../types/_types";
 
 interface Props {

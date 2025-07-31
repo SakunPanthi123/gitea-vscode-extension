@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Timeline from "./Timeline";
-import CommentBox from "./CommentBox";
+import Timeline from "./ui/Timeline";
+import CommentBox from "./ui/CommentBox";
 import { PullRequest, TimelineEvent } from "./../../../types/_types";
 
 interface Props {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { User } from "../../../types/_types";
+import { User } from "../../../../types/_types";
 
 interface Props {
   availableAssignees: User[];

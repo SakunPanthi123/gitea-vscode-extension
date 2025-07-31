@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { TimelineEvent, CommitDetails } from "./../../../types/_types";
+import { TimelineEvent, CommitDetails } from "../../../../types/_types";
 import { Icons } from "./Icons";
 
 interface Props {
