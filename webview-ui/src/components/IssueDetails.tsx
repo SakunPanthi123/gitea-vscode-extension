@@ -159,6 +159,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleEditDescription = (newDescription: string) => {
     onMessage("editIssueDescription", { body: newDescription });
+    setTimeout(()=>{
+      onMessage("refresh")
+    },1000)
   };
 
   const handleRequestMarkdownRender = useCallback(
