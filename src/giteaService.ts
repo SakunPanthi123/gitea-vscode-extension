@@ -122,35 +122,21 @@ export class GiteaService {
         `/${this.getRepoPath()}/issues/${index}`
       );
       const issue: Issue = response.data;
-      console.log(`getIssue: Initial issue data (reactions):`, issue.reactions);
 
       // Fetch reactions for the issue
       try {
-        console.log(`Fetching reactions for issue ${index}...`);
         const reactions = await this.getIssueReactions(index);
-        console.log(
-          `Found ${reactions.length} reactions for issue ${index}:`,
-          reactions
-        );
         const currentUser = await this.getCurrentUser();
-        console.log(`Current user:`, currentUser.login);
         const transformedReactions = transformReactionsToSummary(
           reactions,
           currentUser
         );
-        console.log(`Transformed reactions:`, transformedReactions);
         issue.reactions = transformedReactions;
-        console.log(
-          `getIssue: Issue after setting reactions:`,
-          issue.reactions
-        );
       } catch (error) {
         // If fetching reactions fails, just continue without them
-        console.error(`Failed to fetch reactions for issue ${index}:`, error);
         issue.reactions = [];
       }
 
-      console.log(`getIssue: Final issue object (full):`, issue);
       return issue;
     } catch (error: any) {
       throw new Error(`Failed to fetch issue: ${error.message}`);
@@ -489,19 +475,11 @@ export class GiteaService {
     try {
       const owner = this.config.get<string>("owner");
       const repo = this.config.get<string>("repo");
-      console.log(
-        `Making API call to: /repos/${owner}/${repo}/issues/${issueNumber}/reactions`
-      );
       const response = await this.client.get(
         `/repos/${owner}/${repo}/issues/${issueNumber}/reactions`
       );
-      console.log(
-        `API response for issue ${issueNumber} reactions:`,
-        response.data
-      );
       return response.data;
     } catch (error: any) {
-      console.error(`API error for issue ${issueNumber} reactions:`, error);
       throw new Error(`Failed to get issue reactions: ${error.message}`);
     }
   }

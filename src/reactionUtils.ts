@@ -8,13 +8,7 @@ export function transformReactionsToSummary(
   reactions: Reaction[],
   currentUser?: User
 ): ReactionSummary[] {
-  console.log("transformReactionsToSummary: Input reactions:", reactions);
-  console.log("transformReactionsToSummary: Current user:", currentUser);
-
   if (!reactions || reactions.length === 0) {
-    console.log(
-      "transformReactionsToSummary: No reactions, returning empty array"
-    );
     return [];
   }
 
@@ -48,7 +42,6 @@ export function transformReactionsToSummary(
     }
   );
 
-  console.log("transformReactionsToSummary: Result:", result);
   return result;
 }
 

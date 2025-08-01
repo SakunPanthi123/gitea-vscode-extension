@@ -21,11 +21,24 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
     useState<string>("");
+  const [hasInitiallyFetched, setHasInitiallyFetched] = useState(false);
 
   // Update current pull request when data prop changes
   useEffect(() => {
     setCurrentPullRequest(data);
   }, [data]);
+
+  // Fetch reactions once after component mounts
+  useEffect(() => {
+    if (!hasInitiallyFetched) {
+      const timer = setTimeout(() => {
+        onMessage("refresh");
+        setHasInitiallyFetched(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hasInitiallyFetched, onMessage]);
 
   // No automatic clearing - only clear on explicit refresh
 
@@ -57,12 +70,15 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         // Refresh timeline when comment is edited
         onMessage("getTimeline", { pullRequestNumber: data.number });
       } else if (message.type === "updateData") {
-        // Data updated (e.g., pull request closed/reopened)
-        // The parent will handle the data update automatically - no refresh needed
-        // Removed onMessage("refresh") to prevent infinite loop
+        // Data updated (e.g., pull request closed/reopened, description edited)
+        // Only refresh reactions if this was a description update
+        // For other updates, the parent will handle the data update automatically
       } else if (message.type === "markdownRendered") {
         // Rendered markdown received
         setRenderedDescriptionHtml(message.data);
+      } else if (message.type === "pullRequestDescriptionUpdated") {
+        // Pull request description was updated, refresh the PR data to get updated reactions
+        onMessage("refresh");
       } else if (
         message.type === "reactionAdded" ||
         message.type === "reactionRemoved"

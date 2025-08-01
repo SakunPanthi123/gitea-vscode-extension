@@ -59,11 +59,11 @@ const EditableText: React.FC<Props> = ({
     if (editValue.trim() !== value.trim()) {
       onSave(editValue.trim());
 
-      // Request markdown rendering after 2 seconds of successful edit
+      // Request markdown rendering after 1 second of successful edit
       if (!isTitle && onRequestMarkdownRender) {
         setTimeout(() => {
           onRequestMarkdownRender(editValue.trim());
-        }, 2000);
+        }, 1000);
       }
     }
     setIsEditing(false);

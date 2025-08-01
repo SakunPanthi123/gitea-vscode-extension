@@ -205,6 +205,10 @@ export class ReactWebviewProvider {
               { body: message.body }
             );
             panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            // Send a specific message for description updates to trigger reaction refresh
+            panel.webview.postMessage({
+              type: "pullRequestDescriptionUpdated",
+            });
             vscode.window.showInformationMessage(
               "Pull request description updated successfully"
             );
