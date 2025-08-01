@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import axios, { AxiosInstance } from "axios";
+import { transformReactionsToSummary } from "./reactionUtils";
 import {
   CommitDetails,
   Issue,
@@ -19,6 +20,9 @@ import {
   EditPullRequestRequest,
   MarkdownRenderRequest,
   MarkdownRenderResponse,
+  Reaction,
+  ReactionSummary,
+  EditReactionOption,
   // @ts-ignore
 } from "../types/_types";
 
@@ -77,7 +81,22 @@ export class GiteaService {
       const response = await this.client.get(
         `/${this.getRepoPath()}/pulls/${index}`
       );
-      return response.data;
+      const pullRequest: PullRequest = response.data;
+
+      // Fetch reactions for the pull request
+      try {
+        const reactions = await this.getIssueReactions(index);
+        const currentUser = await this.getCurrentUser();
+        pullRequest.reactions = transformReactionsToSummary(
+          reactions,
+          currentUser
+        );
+      } catch (error) {
+        // If fetching reactions fails, just continue without them
+        pullRequest.reactions = [];
+      }
+
+      return pullRequest;
     } catch (error: any) {
       throw new Error(`Failed to fetch pull request: ${error.message}`);
     }
@@ -102,7 +121,19 @@ export class GiteaService {
       const response = await this.client.get(
         `/${this.getRepoPath()}/issues/${index}`
       );
-      return response.data;
+      const issue: Issue = response.data;
+
+      // Fetch reactions for the issue
+      try {
+        const reactions = await this.getIssueReactions(index);
+        const currentUser = await this.getCurrentUser();
+        issue.reactions = transformReactionsToSummary(reactions, currentUser);
+      } catch (error) {
+        // If fetching reactions fails, just continue without them
+        issue.reactions = [];
+      }
+
+      return issue;
     } catch (error: any) {
       throw new Error(`Failed to fetch issue: ${error.message}`);
     }
@@ -135,7 +166,29 @@ export class GiteaService {
       const response = await this.client.get(
         `/${this.getRepoPath()}/issues/${index}/timeline`
       );
-      return response.data;
+      const timeline: TimelineEvent[] = response.data;
+
+      // Fetch reactions for comment events
+      const enrichedTimeline = await Promise.all(
+        timeline.map(async (event) => {
+          if (event.type === "comment" && event.id) {
+            try {
+              const reactions = await this.getCommentReactions(event.id);
+              const currentUser = await this.getCurrentUser();
+              event.reactions = transformReactionsToSummary(
+                reactions,
+                currentUser
+              );
+            } catch (error) {
+              // If fetching reactions fails, just continue without them
+              event.reactions = [];
+            }
+          }
+          return event;
+        })
+      );
+
+      return enrichedTimeline;
     } catch (error: any) {
       throw new Error(`Failed to fetch issue timeline: ${error.message}`);
     }
@@ -146,7 +199,29 @@ export class GiteaService {
       const response = await this.client.get(
         `/${this.getRepoPath()}/issues/${index}/timeline`
       );
-      return response.data;
+      const timeline: TimelineEvent[] = response.data;
+
+      // Fetch reactions for comment events
+      const enrichedTimeline = await Promise.all(
+        timeline.map(async (event) => {
+          if (event.type === "comment" && event.id) {
+            try {
+              const reactions = await this.getCommentReactions(event.id);
+              const currentUser = await this.getCurrentUser();
+              event.reactions = transformReactionsToSummary(
+                reactions,
+                currentUser
+              );
+            } catch (error) {
+              // If fetching reactions fails, just continue without them
+              event.reactions = [];
+            }
+          }
+          return event;
+        })
+      );
+
+      return enrichedTimeline;
     } catch (error: any) {
       throw new Error(
         `Failed to fetch pull request timeline: ${error.message}`
@@ -316,6 +391,15 @@ export class GiteaService {
     }
   }
 
+  async getCurrentUser(): Promise<User> {
+    try {
+      const response = await this.client.get("/user");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to fetch current user: ${error.message}`);
+    }
+  }
+
   async updateIssueAssignees(
     issueNumber: number,
     assignees: AssigneeRequest
@@ -379,6 +463,100 @@ export class GiteaService {
       return response.data;
     } catch (error: any) {
       throw new Error(`Failed to render markdown: ${error.message}`);
+    }
+  }
+
+  // Reaction methods for issues
+  async getIssueReactions(issueNumber: number): Promise<Reaction[]> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      const response = await this.client.get(
+        `/repos/${owner}/${repo}/issues/${issueNumber}/reactions`
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to get issue reactions: ${error.message}`);
+    }
+  }
+
+  async addIssueReaction(
+    issueNumber: number,
+    reaction: string
+  ): Promise<Reaction> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      const response = await this.client.post(
+        `/repos/${owner}/${repo}/issues/${issueNumber}/reactions`,
+        { content: reaction }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to add issue reaction: ${error.message}`);
+    }
+  }
+
+  async removeIssueReaction(
+    issueNumber: number,
+    reaction: string
+  ): Promise<void> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      await this.client.delete(
+        `/repos/${owner}/${repo}/issues/${issueNumber}/reactions`,
+        { data: { content: reaction } }
+      );
+    } catch (error: any) {
+      throw new Error(`Failed to remove issue reaction: ${error.message}`);
+    }
+  }
+
+  // Reaction methods for comments
+  async getCommentReactions(commentId: number): Promise<Reaction[]> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      const response = await this.client.get(
+        `/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to get comment reactions: ${error.message}`);
+    }
+  }
+
+  async addCommentReaction(
+    commentId: number,
+    reaction: string
+  ): Promise<Reaction> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      const response = await this.client.post(
+        `/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`,
+        { content: reaction }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(`Failed to add comment reaction: ${error.message}`);
+    }
+  }
+
+  async removeCommentReaction(
+    commentId: number,
+    reaction: string
+  ): Promise<void> {
+    try {
+      const owner = this.config.get<string>("owner");
+      const repo = this.config.get<string>("repo");
+      await this.client.delete(
+        `/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`,
+        { data: { content: reaction } }
+      );
+    } catch (error: any) {
+      throw new Error(`Failed to remove comment reaction: ${error.message}`);
     }
   }
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Timeline from "./ui/Timeline";
 import CommentBox from "./ui/CommentBox";
 import EditableText from "./ui/EditableText";
+import ReactionPicker from "./ui/ReactionPicker";
 import { PullRequest, TimelineEvent } from "./../../../types/_types";
 
 interface Props {
@@ -101,6 +102,21 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     },
     [onMessage]
   );
+
+  // Reaction handlers
+  const handleAddPullRequestReaction = (reaction: string) => {
+    onMessage("addPullRequestReaction", {
+      pullRequestNumber: data.number,
+      reaction,
+    });
+  };
+
+  const handleRemovePullRequestReaction = (reaction: string) => {
+    onMessage("removePullRequestReaction", {
+      pullRequestNumber: data.number,
+      reaction,
+    });
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
@@ -227,6 +243,13 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             isTitle={false}
             placeholder="No description provided"
           />
+          <div className="mt-4">
+            <ReactionPicker
+              reactions={data.reactions || []}
+              onAddReaction={handleAddPullRequestReaction}
+              onRemoveReaction={handleRemovePullRequestReaction}
+            />
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -239,6 +262,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               enableCommits={true}
               canDeleteComments={true}
               canEditComments={true}
+              canReact={true}
             />
           </div>
           <div>

@@ -4,6 +4,7 @@ import CommentBox from "./ui/CommentBox";
 import LabelPicker from "./ui/LabelPicker";
 import AssigneePicker from "./ui/AssigneePicker";
 import EditableText from "./ui/EditableText";
+import ReactionPicker from "./ui/ReactionPicker";
 import { Issue, TimelineEvent, Label, User } from "../../../types/_types";
 
 interface Props {
@@ -135,6 +136,15 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     },
     [onMessage]
   );
+
+  // Reaction handlers
+  const handleAddIssueReaction = (reaction: string) => {
+    onMessage("addIssueReaction", { issueNumber: data.number, reaction });
+  };
+
+  const handleRemoveIssueReaction = (reaction: string) => {
+    onMessage("removeIssueReaction", { issueNumber: data.number, reaction });
+  };
 
   // Convert simplified issue labels to full Label objects when possible
   const getCurrentLabels = (): Label[] => {
@@ -332,6 +342,13 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               isTitle={false}
               placeholder="No description provided"
             />
+            <div className="mt-4">
+              <ReactionPicker
+                reactions={data.reactions || []}
+                onAddReaction={handleAddIssueReaction}
+                onRemoveReaction={handleRemoveIssueReaction}
+              />
+            </div>
           </div>
           <div className="bg-gray-50 bg-opacity-5 -lg p-4 mt-4">
             <h3 className="text-lg font-semibold mb-3">Timeline</h3>
@@ -342,6 +359,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
               enableCommits={false}
               canDeleteComments={true}
               canEditComments={true}
+              canReact={true}
             />
           </div>
           <div className="mt-4">

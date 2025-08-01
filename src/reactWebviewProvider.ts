@@ -230,6 +230,72 @@ export class ReactWebviewProvider {
             // );
           }
           break;
+        case "addPullRequestReaction":
+          try {
+            await this.giteaService.addIssueReaction(
+              message.pullRequestNumber,
+              message.reaction
+            );
+            // Refresh pull request to get updated reactions
+            const updatedPR = await this.giteaService.getPullRequest(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to add reaction: ${error}`);
+          }
+          break;
+        case "removePullRequestReaction":
+          try {
+            await this.giteaService.removeIssueReaction(
+              message.pullRequestNumber,
+              message.reaction
+            );
+            // Refresh pull request to get updated reactions
+            const updatedPR = await this.giteaService.getPullRequest(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to remove reaction: ${error}`
+            );
+          }
+          break;
+        case "addCommentReaction":
+          try {
+            await this.giteaService.addCommentReaction(
+              message.commentId,
+              message.reaction
+            );
+            // Refresh timeline to get updated reactions
+            const timeline = await this.giteaService.getPullRequestTimeline(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to add comment reaction: ${error}`
+            );
+          }
+          break;
+        case "removeCommentReaction":
+          try {
+            await this.giteaService.removeCommentReaction(
+              message.commentId,
+              message.reaction
+            );
+            // Refresh timeline to get updated reactions
+            const timeline = await this.giteaService.getPullRequestTimeline(
+              pullRequest.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to remove comment reaction: ${error}`
+            );
+          }
+          break;
       }
     });
   }
@@ -481,6 +547,74 @@ export class ReactWebviewProvider {
             // vscode.window.showErrorMessage(
             //   `Failed to render markdown: ${error}`
             // );
+          }
+          break;
+        case "addIssueReaction":
+          try {
+            await this.giteaService.addIssueReaction(
+              message.issueNumber,
+              message.reaction
+            );
+            // Refresh issue to get updated reactions
+            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(`Failed to add reaction: ${error}`);
+          }
+          break;
+        case "removeIssueReaction":
+          try {
+            await this.giteaService.removeIssueReaction(
+              message.issueNumber,
+              message.reaction
+            );
+            // Refresh issue to get updated reactions
+            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            panel.webview.postMessage({
+              type: "updateData",
+              data: updatedIssue,
+            });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to remove reaction: ${error}`
+            );
+          }
+          break;
+        case "addCommentReaction":
+          try {
+            await this.giteaService.addCommentReaction(
+              message.commentId,
+              message.reaction
+            );
+            // Refresh timeline to get updated reactions
+            const timeline = await this.giteaService.getIssueTimeline(
+              issue.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to add comment reaction: ${error}`
+            );
+          }
+          break;
+        case "removeCommentReaction":
+          try {
+            await this.giteaService.removeCommentReaction(
+              message.commentId,
+              message.reaction
+            );
+            // Refresh timeline to get updated reactions
+            const timeline = await this.giteaService.getIssueTimeline(
+              issue.number
+            );
+            panel.webview.postMessage({ type: "timelineData", data: timeline });
+          } catch (error) {
+            vscode.window.showErrorMessage(
+              `Failed to remove comment reaction: ${error}`
+            );
           }
           break;
       }

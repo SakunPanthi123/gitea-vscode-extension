@@ -130,3 +130,8 @@ code {
   border-top: 1px solid var(--vscode-panel-border);
   margin: 2em 0;
 }
+
+.rendered-markdown checkbox {
+  accent-color: var(--vscode-checkbox-foreground);
+  margin-right: 0.5em;
+}

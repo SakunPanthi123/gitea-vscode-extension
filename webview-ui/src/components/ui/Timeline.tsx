@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TimelineEvent, CommitDetails } from "../../../../types/_types";
 import { Icons } from "./Icons";
+import ReactionPicker from "./ReactionPicker";
 
 interface Props {
   events: TimelineEvent[];
@@ -9,6 +10,7 @@ interface Props {
   enableCommits?: boolean; // New prop to control commit functionality
   canDeleteComments?: boolean; // New prop to control comment deletion
   canEditComments?: boolean; // New prop to control comment editing
+  canReact?: boolean; // New prop to control reactions
 }
 
 const Timeline: React.FC<Props> = ({
@@ -18,6 +20,7 @@ const Timeline: React.FC<Props> = ({
   enableCommits = true,
   canDeleteComments = true,
   canEditComments = true,
+  canReact = true,
 }) => {
   const [commitDetails, setCommitDetails] = useState<
     Record<string, CommitDetails>
@@ -123,6 +126,19 @@ const Timeline: React.FC<Props> = ({
   const handleCancelEdit = () => {
     setEditingCommentId(null);
     setEditCommentText("");
+  };
+
+  // Reaction handlers
+  const handleAddCommentReaction = (commentId: number, reaction: string) => {
+    if (onMessage) {
+      onMessage("addCommentReaction", { commentId, reaction });
+    }
+  };
+
+  const handleRemoveCommentReaction = (commentId: number, reaction: string) => {
+    if (onMessage) {
+      onMessage("removeCommentReaction", { commentId, reaction });
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -599,8 +615,23 @@ const Timeline: React.FC<Props> = ({
                         </div>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-300 whitespace-pre-wrap">
-                        {event.body}
+                      <div>
+                        <div className="text-sm text-gray-300 whitespace-pre-wrap">
+                          {event.body}
+                        </div>
+                        {canReact && (
+                          <div className="mt-3">
+                            <ReactionPicker
+                              reactions={event.reactions || []}
+                              onAddReaction={(reaction) =>
+                                handleAddCommentReaction(event.id, reaction)
+                              }
+                              onRemoveReaction={(reaction) =>
+                                handleRemoveCommentReaction(event.id, reaction)
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

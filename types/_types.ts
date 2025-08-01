@@ -40,6 +40,7 @@ export interface Issue {
   created_at: string;
   updated_at: string;
   html_url: string;
+  reactions?: ReactionSummary[];
 }
 
 export interface PullRequest {
@@ -62,6 +63,7 @@ export interface PullRequest {
   updated_at: string;
   html_url: string;
   mergeable: boolean;
+  reactions?: ReactionSummary[];
 }
 
 export interface RefIssue {
@@ -146,6 +148,7 @@ export interface TimelineEvent {
   removed_assignee: boolean;
   resolve_doer: any;
   dependent_issue: any;
+  reactions?: ReactionSummary[];
 }
 
 export interface CommitFile {
@@ -193,6 +196,7 @@ export interface Comment {
   assets: any[];
   created_at: string;
   updated_at: string;
+  reactions?: ReactionSummary[];
 }
 
 export interface CommentCreateRequest {
@@ -264,4 +268,26 @@ export interface MarkdownRenderRequest {
 
 export interface MarkdownRenderResponse {
   html: string;
+}
+
+export interface Reaction {
+  content: string;
+  created_at: string;
+  user: User;
+}
+
+export interface ReactionSummary {
+  content: string;
+  count: number;
+  users: User[];
+  me: boolean; // true if current user has reacted
+}
+
+export interface EditReactionOption {
+  content: string;
+}
+
+export interface ReactableItem {
+  id: number;
+  reactions?: ReactionSummary[];
 }
