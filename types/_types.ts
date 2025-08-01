@@ -64,6 +64,58 @@ export interface PullRequest {
   mergeable: boolean;
 }
 
+export interface RefIssue {
+  id: number;
+  url: string;
+  html_url: string;
+  number: number;
+  user: User;
+  original_author: string;
+  original_author_id: number;
+  title: string;
+  body: string;
+  ref: string;
+  assets: any[];
+  labels: Label[];
+  milestone: any;
+  assignee: User | null;
+  assignees: User[] | null;
+  state: string;
+  is_locked: boolean;
+  comments: number;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+  due_date: string | null;
+  pull_request?: {
+    merged: boolean;
+    merged_at: string | null;
+    draft: boolean;
+    html_url: string;
+  };
+  repository: {
+    id: number;
+    name: string;
+    owner: string;
+    full_name: string;
+  };
+  pin_order: number;
+}
+
+export interface RefComment {
+  id: number;
+  html_url: string;
+  pull_request_url: string;
+  issue_url: string;
+  user: User;
+  original_author: string;
+  original_author_id: number;
+  body: string;
+  assets: any[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TimelineEvent {
   id: number;
   type: string;
@@ -83,8 +135,8 @@ export interface TimelineEvent {
   new_title: string;
   old_ref: string;
   new_ref: string;
-  ref_issue: any;
-  ref_comment: any;
+  ref_issue: RefIssue | null;
+  ref_comment: RefComment | null;
   ref_action: string;
   ref_commit_sha: string;
   review_id: number;

@@ -106,8 +106,8 @@ Click on any item to see detailed information in a modern React-based webview.
 
 ## Development Workflow
 
-1. Make changes to the extension code in `src/`
-2. Make changes to the React components in `webview-ui/src/`
+1. Make changes to the extension code in `src/`, 
+2. Make changes to the React components in `webview-ui/src/`, resusable ui code in `webview-ui/src/components/ui/`
 3. Run `npm run compile` to build everything
 4. Press Ctrl+R in the Extension Development Host to reload the extension
 5. Test your changes

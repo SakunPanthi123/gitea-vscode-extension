@@ -148,6 +148,8 @@ const Timeline: React.FC<Props> = ({
     switch (type) {
       case "comment":
         return "💬";
+      case "comment_ref":
+        return "🔗";
       case "label":
         return "🏷️";
       case "project":
@@ -200,10 +202,51 @@ const Timeline: React.FC<Props> = ({
     return `${action} label "${currentEvent.label.name}"`;
   };
 
+  // Helper function to generate descriptive text for comment_ref events
+  const getCommentRefDescription = (event: TimelineEvent): string => {
+    if (!event.ref_issue || !event.ref_comment || !event.ref_action) {
+      return "referenced this";
+    }
+
+    const refIssue = event.ref_issue;
+    const refAction = event.ref_action;
+
+    // Determine if it's a pull request or issue
+    const isPullRequest = refIssue.pull_request !== undefined;
+    const itemType = isPullRequest ? "pull request" : "issue";
+
+    // Create descriptive text based on the action
+    let actionText = "";
+    switch (refAction.toLowerCase()) {
+      case "closes":
+      case "close":
+        actionText = `referenced a ${itemType} that will close this issue`;
+        break;
+      case "fixes":
+      case "fix":
+        actionText = `referenced a ${itemType} that will fix this issue`;
+        break;
+      case "resolves":
+      case "resolve":
+        actionText = `referenced a ${itemType} that will resolve this issue`;
+        break;
+      case "mentions":
+      case "mention":
+        actionText = `mentioned this in ${itemType}`;
+        break;
+      default:
+        actionText = `referenced this in ${itemType}`;
+    }
+
+    return actionText;
+  };
+
   const getEventDescription = (event: TimelineEvent) => {
     switch (event.type) {
       case "comment":
         return "commented";
+      case "comment_ref":
+        return getCommentRefDescription(event);
       case "label":
         return getLabelAction(event, events);
       case "project":
@@ -466,6 +509,66 @@ const Timeline: React.FC<Props> = ({
                     >
                       {event.label.name}
                     </span>
+                  </div>
+                )}
+
+                {event.type === "comment_ref" && event.ref_issue && (
+                  <div className="mt-2 p-3 bg-blue-50 bg-opacity-5 border-l-2 border-blue-400 border-opacity-50">
+                    <div className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-0.5">
+                        {event.ref_issue.pull_request ? "🔀" : "🐛"}
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <a
+                            href={event.ref_issue.html_url}
+                            className="text-blue-400 hover:text-blue-300 font-medium text-sm"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            #{event.ref_issue.number}
+                          </a>
+                          <span className="text-xs text-gray-400">
+                            {event.ref_issue.pull_request
+                              ? "Pull Request"
+                              : "Issue"}
+                          </span>
+                          {event.ref_issue.pull_request?.draft && (
+                            <span className="px-1.5 py-0.5 bg-gray-600 bg-opacity-50 text-xs text-gray-300 rounded">
+                              Draft
+                            </span>
+                          )}
+                          <span
+                            className={`px-1.5 py-0.5 text-xs rounded ${
+                              event.ref_issue.state === "open"
+                                ? "bg-green-600 bg-opacity-50 text-green-300"
+                                : "bg-red-600 bg-opacity-50 text-red-300"
+                            }`}
+                          >
+                            {event.ref_issue.state}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-300 font-medium mb-2">
+                          {event.ref_issue.title}
+                        </div>
+                        {event.ref_comment && event.ref_comment.body && (
+                          <div className="text-xs text-gray-400 bg-gray-800 bg-opacity-30 p-2 rounded border-l-2 border-gray-600">
+                            <div className="flex items-center gap-1 mb-1 text-gray-500">
+                              <span>💬</span>
+                              <span>Referenced comment:</span>
+                            </div>
+                            <div className="text-gray-300 whitespace-pre-wrap">
+                              {event.ref_comment.body.length > 200
+                                ? `${event.ref_comment.body.substring(
+                                    0,
+                                    200
+                                  )}...`
+                                : event.ref_comment.body}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
