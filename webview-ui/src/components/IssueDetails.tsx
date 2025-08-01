@@ -155,6 +155,11 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleEditTitle = (newTitle: string) => {
     onMessage("editIssueTitle", { title: newTitle });
+    // refresh for fetching reactions
+    setTimeout(() => {
+    onMessage("refresh"); 
+    }
+    , 1000);
   };
 
   const handleEditDescription = (newDescription: string) => {
