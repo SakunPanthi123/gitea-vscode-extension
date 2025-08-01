@@ -2,7 +2,7 @@
   "name": "gitea-integration",
   "displayName": "Gitea Integration",
   "description": "A modern React-based VS Code extension to integrate with Gitea repositories, allowing you to view and manage pull requests and issues",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "SakunPanthi",
   "repository": {
     "type": "git",
@@ -16,13 +16,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*",
-    "onCommand:gitea.viewPullRequests",
-    "onCommand:gitea.viewIssues",
-    "onCommand:gitea.refreshPullRequests",
-    "onCommand:gitea.refreshIssues",
-    "onCommand:gitea.showPullRequestDetails",
-    "onCommand:gitea.showIssueDetails"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {

@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.1.1] - 2025-08-01
+
+### Added
+
+- **Reaction Picker Addtion**:
+  - Added a new reaction picker component for issues and pull requests
+  - Allows users to add reactions to comments with a simple click
+  - Supports multiple reactions with a dropdown interface
+  - Displays existing reactions
+
+- **Improved UX**:
+  - Comment refs in timeline now show the referenced issue or pull request
+
 ## [1.1.0] - 2025-07-31
 
 ### Added
@@ -19,7 +32,7 @@
 - Prevented accidental form submission when interacting with label and assignee pickers
 - Improved event handling in dropdown components to prevent event bubbling
 
-## [1.0.9] - Previous releases
+## [1.0.0] to [1.0.9] - Previous releases
 
 ### Added
 
