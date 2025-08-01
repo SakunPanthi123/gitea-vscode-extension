@@ -236,11 +236,14 @@ export class ReactWebviewProvider {
               message.pullRequestNumber,
               message.reaction
             );
-            // Refresh pull request to get updated reactions
-            const updatedPR = await this.giteaService.getPullRequest(
-              pullRequest.number
-            );
-            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            // Send reaction added message to trigger refresh
+            panel.webview.postMessage({
+              type: "reactionAdded",
+              data: {
+                pullRequestNumber: message.pullRequestNumber,
+                reaction: message.reaction,
+              },
+            });
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to add reaction: ${error}`);
           }
@@ -251,11 +254,14 @@ export class ReactWebviewProvider {
               message.pullRequestNumber,
               message.reaction
             );
-            // Refresh pull request to get updated reactions
-            const updatedPR = await this.giteaService.getPullRequest(
-              pullRequest.number
-            );
-            panel.webview.postMessage({ type: "updateData", data: updatedPR });
+            // Send reaction removed message to trigger refresh
+            panel.webview.postMessage({
+              type: "reactionRemoved",
+              data: {
+                pullRequestNumber: message.pullRequestNumber,
+                reaction: message.reaction,
+              },
+            });
           } catch (error) {
             vscode.window.showErrorMessage(
               `Failed to remove reaction: ${error}`
@@ -306,9 +312,32 @@ export class ReactWebviewProvider {
       this.currentDetailsPanel.dispose();
     }
 
+    console.log("showIssueDetails: Input issue:", issue);
+    console.log("showIssueDetails: Input issue reactions:", issue.reactions);
+
+    // Always fetch the complete issue data with reactions
+    let fullIssue: Issue;
+    try {
+      console.log("showIssueDetails: Calling getIssue for issue", issue.number);
+      fullIssue = await this.giteaService.getIssue(issue.number);
+      console.log("showIssueDetails: Received fullIssue:", fullIssue);
+      console.log(
+        "showIssueDetails: fullIssue reactions:",
+        fullIssue.reactions
+      );
+    } catch (error) {
+      // Fallback to the provided issue if fetching fails
+      console.error(
+        "showIssueDetails: Failed to fetch issue, using fallback:",
+        error
+      );
+      fullIssue = issue;
+      vscode.window.showErrorMessage(`Failed to fetch issue details: ${error}`);
+    }
+
     const panel = vscode.window.createWebviewPanel(
       ReactWebviewProvider.detailsViewType,
-      `Issue #${issue.number}: ${issue.title}`,
+      `Issue #${fullIssue.number}: ${fullIssue.title}`,
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -329,7 +358,11 @@ export class ReactWebviewProvider {
       }
     });
 
-    panel.webview.html = this.getWebviewContent(panel.webview, "issue", issue);
+    panel.webview.html = this.getWebviewContent(
+      panel.webview,
+      "issue",
+      fullIssue
+    );
 
     panel.webview.onDidReceiveMessage(async (message) => {
       switch (message.type) {
@@ -338,7 +371,9 @@ export class ReactWebviewProvider {
           break;
         case "refresh":
           try {
-            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            const updatedIssue = await this.giteaService.getIssue(
+              fullIssue.number
+            );
             panel.webview.postMessage({
               type: "updateData",
               data: updatedIssue,
@@ -397,7 +432,7 @@ export class ReactWebviewProvider {
             });
             // Also refresh timeline to show updated comment
             const timeline = await this.giteaService.getIssueTimeline(
-              message.issueNumber || issue.number
+              message.issueNumber || fullIssue.number
             );
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {
@@ -407,14 +442,14 @@ export class ReactWebviewProvider {
         case "closeIssue":
           try {
             const updatedIssue = await this.giteaService.closeIssue(
-              issue.number
+              fullIssue.number
             );
             panel.webview.postMessage({
               type: "updateData",
               data: updatedIssue,
             });
             vscode.window.showInformationMessage(
-              `Issue #${issue.number} closed successfully`
+              `Issue #${fullIssue.number} closed successfully`
             );
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to close issue: ${error}`);
@@ -423,14 +458,14 @@ export class ReactWebviewProvider {
         case "reopenIssue":
           try {
             const updatedIssue = await this.giteaService.reopenIssue(
-              issue.number
+              fullIssue.number
             );
             panel.webview.postMessage({
               type: "updateData",
               data: updatedIssue,
             });
             vscode.window.showInformationMessage(
-              `Issue #${issue.number} reopened successfully`
+              `Issue #${fullIssue.number} reopened successfully`
             );
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to reopen issue: ${error}`);
@@ -450,7 +485,7 @@ export class ReactWebviewProvider {
         case "updateIssueLabels":
           try {
             const updatedLabels = await this.giteaService.replaceIssueLabels(
-              issue.number,
+              fullIssue.number,
               { labels: message.labelIds }
             );
             panel.webview.postMessage({
@@ -478,7 +513,7 @@ export class ReactWebviewProvider {
         case "updateIssueAssignees":
           try {
             const updatedIssue = await this.giteaService.updateIssueAssignees(
-              issue.number,
+              fullIssue.number,
               { assignees: message.assignees }
             );
             panel.webview.postMessage({
@@ -497,14 +532,14 @@ export class ReactWebviewProvider {
         case "editIssueTitle":
           try {
             const updatedIssue = await this.giteaService.editIssue(
-              issue.number,
+              fullIssue.number,
               { title: message.title }
             );
             panel.webview.postMessage({
               type: "updateData",
               data: updatedIssue,
             });
-            panel.title = `Issue #${issue.number}: ${message.title}`;
+            panel.title = `Issue #${fullIssue.number}: ${message.title}`;
             vscode.window.showInformationMessage(
               "Issue title updated successfully"
             );
@@ -517,12 +552,16 @@ export class ReactWebviewProvider {
         case "editIssueDescription":
           try {
             const updatedIssue = await this.giteaService.editIssue(
-              issue.number,
+              fullIssue.number,
               { body: message.body }
             );
             panel.webview.postMessage({
               type: "updateData",
               data: updatedIssue,
+            });
+            // Send a specific message for description updates to trigger reaction refresh
+            panel.webview.postMessage({
+              type: "issueDescriptionUpdated",
             });
             vscode.window.showInformationMessage(
               "Issue description updated successfully"
@@ -555,11 +594,13 @@ export class ReactWebviewProvider {
               message.issueNumber,
               message.reaction
             );
-            // Refresh issue to get updated reactions
-            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            // Send reaction added message to trigger refresh
             panel.webview.postMessage({
-              type: "updateData",
-              data: updatedIssue,
+              type: "reactionAdded",
+              data: {
+                issueNumber: message.issueNumber,
+                reaction: message.reaction,
+              },
             });
           } catch (error) {
             vscode.window.showErrorMessage(`Failed to add reaction: ${error}`);
@@ -571,11 +612,13 @@ export class ReactWebviewProvider {
               message.issueNumber,
               message.reaction
             );
-            // Refresh issue to get updated reactions
-            const updatedIssue = await this.giteaService.getIssue(issue.number);
+            // Send reaction removed message to trigger refresh
             panel.webview.postMessage({
-              type: "updateData",
-              data: updatedIssue,
+              type: "reactionRemoved",
+              data: {
+                issueNumber: message.issueNumber,
+                reaction: message.reaction,
+              },
             });
           } catch (error) {
             vscode.window.showErrorMessage(
@@ -591,7 +634,7 @@ export class ReactWebviewProvider {
             );
             // Refresh timeline to get updated reactions
             const timeline = await this.giteaService.getIssueTimeline(
-              issue.number
+              fullIssue.number
             );
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {
@@ -608,7 +651,7 @@ export class ReactWebviewProvider {
             );
             // Refresh timeline to get updated reactions
             const timeline = await this.giteaService.getIssueTimeline(
-              issue.number
+              fullIssue.number
             );
             panel.webview.postMessage({ type: "timelineData", data: timeline });
           } catch (error) {

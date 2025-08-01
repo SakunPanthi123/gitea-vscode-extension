@@ -8,7 +8,13 @@ export function transformReactionsToSummary(
   reactions: Reaction[],
   currentUser?: User
 ): ReactionSummary[] {
+  console.log("transformReactionsToSummary: Input reactions:", reactions);
+  console.log("transformReactionsToSummary: Current user:", currentUser);
+
   if (!reactions || reactions.length === 0) {
+    console.log(
+      "transformReactionsToSummary: No reactions, returning empty array"
+    );
     return [];
   }
 
@@ -23,22 +29,27 @@ export function transformReactionsToSummary(
   }, {} as Record<string, Reaction[]>);
 
   // Transform to ReactionSummary format
-  return Object.entries(reactionGroups).map(([content, groupedReactions]) => {
-    const users = groupedReactions.map((r) => r.user);
-    const currentUserReacted = currentUser
-      ? users.some(
-          (user) =>
-            user.id === currentUser.id || user.login === currentUser.login
-        )
-      : false;
+  const result = Object.entries(reactionGroups).map(
+    ([content, groupedReactions]) => {
+      const users = groupedReactions.map((r) => r.user);
+      const currentUserReacted = currentUser
+        ? users.some(
+            (user) =>
+              user.id === currentUser.id || user.login === currentUser.login
+          )
+        : false;
 
-    return {
-      content,
-      count: groupedReactions.length,
-      users,
-      me: currentUserReacted,
-    };
-  });
+      return {
+        content,
+        count: groupedReactions.length,
+        users,
+        me: currentUserReacted,
+      };
+    }
+  );
+
+  console.log("transformReactionsToSummary: Result:", result);
+  return result;
 }
 
 /**

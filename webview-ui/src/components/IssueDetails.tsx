@@ -14,6 +14,7 @@ interface Props {
 }
 
 const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
+  const [currentIssue, setCurrentIssue] = useState<Issue>(data);
   const [timelineData, setTimelineData] = useState<TimelineEvent[]>(
     timeline || []
   );
@@ -25,13 +26,31 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [isLoadingAssignees, setIsLoadingAssignees] = useState(false);
   const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
     useState<string>("");
+  const [hasInitiallyFetched, setHasInitiallyFetched] = useState(false);
+
+  // Update current issue when data prop changes
+  useEffect(() => {
+    setCurrentIssue(data);
+  }, [data]);
+
+  // Fetch reactions once after component mounts
+  useEffect(() => {
+    if (!hasInitiallyFetched) {
+      const timer = setTimeout(() => {
+        onMessage("refresh");
+        setHasInitiallyFetched(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hasInitiallyFetched, onMessage]);
 
   // No automatic clearing - only clear on explicit refresh
 
   useEffect(() => {
     if (!timeline) {
       // Request timeline data if not provided
-      onMessage("getTimeline", { issueNumber: data.number });
+      onMessage("getTimeline", { issueNumber: currentIssue.number });
     }
 
     // Request available labels
@@ -40,7 +59,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
     // Request available assignees
     onMessage("getRepositoryAssignees");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.number, timeline]); // Removed onMessage from dependencies to prevent infinite refreshing
+  }, [currentIssue.number, timeline]); // Removed onMessage from dependencies to prevent infinite refreshing
 
   useEffect(() => {
     // Listen for timeline updates
@@ -51,18 +70,18 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
         setIsLoadingTimeline(false);
       } else if (message.type === "commentAdded") {
         // Refresh timeline when comment is added
-        onMessage("getTimeline", { issueNumber: data.number });
+        onMessage("getTimeline", { issueNumber: currentIssue.number });
         setIsAddingComment(false);
       } else if (message.type === "commentDeleted") {
         // Refresh timeline when comment is deleted
-        onMessage("getTimeline", { issueNumber: data.number });
+        onMessage("getTimeline", { issueNumber: currentIssue.number });
       } else if (message.type === "commentEdited") {
         // Refresh timeline when comment is edited
-        onMessage("getTimeline", { issueNumber: data.number });
+        onMessage("getTimeline", { issueNumber: currentIssue.number });
       } else if (message.type === "updateData") {
-        // Data updated (e.g., issue closed/reopened)
-        // The parent will handle the data update automatically - no refresh needed
-        // Removed onMessage("refresh") to prevent infinite loop
+        // Data updated (e.g., issue closed/reopened, description edited)
+        // Only refresh reactions if this was a description update
+        // For other updates, the parent will handle the data update automatically
       } else if (message.type === "repositoryLabels") {
         setAvailableLabels(message.data);
         setIsLoadingLabels(false);
@@ -78,18 +97,27 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "markdownRendered") {
         // Rendered markdown received
         setRenderedDescriptionHtml(message.data);
+      } else if (message.type === "issueDescriptionUpdated") {
+        // Issue description was updated, refresh the issue data to get updated reactions
+        onMessage("refresh");
+      } else if (
+        message.type === "reactionAdded" ||
+        message.type === "reactionRemoved"
+      ) {
+        // Reaction was added or removed, refresh the issue data to get updated reactions
+        onMessage("refresh");
       }
     };
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.number]); // Removed onMessage from dependencies to prevent infinite refreshing
+  }, [currentIssue.number]); // Removed onMessage from dependencies to prevent infinite refreshing
 
   const handleRefresh = () => {
     onMessage("refresh");
     setIsLoadingTimeline(true);
-    onMessage("getTimeline", { issueNumber: data.number });
+    onMessage("getTimeline", { issueNumber: currentIssue.number });
 
     // Clear rendered HTML on explicit refresh to force re-rendering
     setRenderedDescriptionHtml("");
@@ -101,7 +129,10 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   const handleAddComment = (comment: string) => {
     setIsAddingComment(true);
-    onMessage("addComment", { issueNumber: data.number, body: comment });
+    onMessage("addComment", {
+      issueNumber: currentIssue.number,
+      body: comment,
+    });
   };
 
   const handleCloseIssue = () => {
@@ -139,18 +170,24 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
 
   // Reaction handlers
   const handleAddIssueReaction = (reaction: string) => {
-    onMessage("addIssueReaction", { issueNumber: data.number, reaction });
+    onMessage("addIssueReaction", {
+      issueNumber: currentIssue.number,
+      reaction,
+    });
   };
 
   const handleRemoveIssueReaction = (reaction: string) => {
-    onMessage("removeIssueReaction", { issueNumber: data.number, reaction });
+    onMessage("removeIssueReaction", {
+      issueNumber: currentIssue.number,
+      reaction,
+    });
   };
 
   // Convert simplified issue labels to full Label objects when possible
   const getCurrentLabels = (): Label[] => {
-    if (!data.labels) return [];
+    if (!currentIssue.labels) return [];
 
-    return data.labels.map((issueLabel) => {
+    return currentIssue.labels.map((issueLabel) => {
       // Try to find the full label from available labels
       const fullLabel = availableLabels.find(
         (availableLabel) => availableLabel.name === issueLabel.name
@@ -174,8 +211,8 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   };
 
   const getCurrentAssignees = (): User[] => {
-    if (!data.assignees) return [];
-    return data.assignees;
+    if (!currentIssue.assignees) return [];
+    return currentIssue.assignees;
   };
 
   const formatDate = (dateString: string) => {
@@ -189,19 +226,21 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           <div className="flex items-center gap-3 mb-4">
             <span
               className={`px-3 py-1  text-sm font-medium ${
-                data.state === "open"
+                currentIssue.state === "open"
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
               }`}
             >
-              {data.state}
+              {currentIssue.state}
             </span>
-            <span className="text-lg text-gray-400">#{data.number}</span>
+            <span className="text-lg text-gray-400">
+              #{currentIssue.number}
+            </span>
           </div>
 
           <div className="mb-4">
             <EditableText
-              value={data.title}
+              value={currentIssue.title}
               onSave={handleEditTitle}
               isTitle={true}
               placeholder="Enter issue title..."
@@ -209,9 +248,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400 mb-6">
-            <span>By {data.user.login}</span>
-            <span>Created {formatDate(data.created_at)}</span>
-            <span>Updated {formatDate(data.updated_at)}</span>
+            <span>By {currentIssue.user.login}</span>
+            <span>Created {formatDate(currentIssue.created_at)}</span>
+            <span>Updated {formatDate(currentIssue.updated_at)}</span>
           </div>
         </div>
 
@@ -223,12 +262,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             Refresh
           </button>
           <button
-            onClick={() => handleOpenExternal(data.html_url)}
+            onClick={() => handleOpenExternal(currentIssue.html_url)}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700  transition-colors"
           >
             Open in Gitea
           </button>
-          {data.state === "open" ? (
+          {currentIssue.state === "open" ? (
             <button
               onClick={handleCloseIssue}
               className="px-4 py-2 bg-red-600 hover:bg-red-700  transition-colors"
@@ -259,9 +298,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                   isLoading={isLoadingLabels}
                 />
               </div>
-              {data.labels && data.labels.length > 0 ? (
+              {currentIssue.labels && currentIssue.labels.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {data.labels.map((label, index) => (
+                  {currentIssue.labels.map((label, index) => (
                     <span
                       key={index}
                       className="px-3 py-1  text-sm font-medium"
@@ -292,9 +331,9 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
                   isLoading={isLoadingAssignees}
                 />
               </div>
-              {data.assignees && data.assignees.length > 0 ? (
+              {currentIssue.assignees && currentIssue.assignees.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  {data.assignees.map((assignee) => (
+                  {currentIssue.assignees.map((assignee) => (
                     <div key={assignee.id} className="flex items-center gap-2">
                       <img
                         src={assignee.avatar_url}
@@ -321,12 +360,12 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             <h3 className="text-lg font-semibold mb-3">Author</h3>
             <div className="flex items-center gap-3">
               <img
-                src={data.user.avatar_url}
-                alt={data.user.login}
+                src={currentIssue.user.avatar_url}
+                alt={currentIssue.user.login}
                 className="w-10 h-10 -full"
               />
               <div>
-                <div className="font-medium">{data.user.login}</div>
+                <div className="font-medium">{currentIssue.user.login}</div>
               </div>
             </div>
           </div>
@@ -335,7 +374,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           <div className="bg-gray-50 bg-opacity-5 -lg p-4 ">
             <h3 className="text-lg font-semibold mb-3">Description</h3>
             <EditableText
-              value={data.body || ""}
+              value={currentIssue.body || ""}
               onSave={handleEditDescription}
               onRequestMarkdownRender={handleRequestMarkdownRender}
               renderedHtml={renderedDescriptionHtml}
@@ -344,7 +383,7 @@ const IssueDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
             />
             <div className="mt-4">
               <ReactionPicker
-                reactions={data.reactions || []}
+                reactions={currentIssue.reactions || []}
                 onAddReaction={handleAddIssueReaction}
                 onRemoveReaction={handleRemoveIssueReaction}
               />

@@ -12,6 +12,8 @@ interface Props {
 }
 
 const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
+  const [currentPullRequest, setCurrentPullRequest] =
+    useState<PullRequest>(data);
   const [timelineData, setTimelineData] = useState<TimelineEvent[]>(
     timeline || []
   );
@@ -20,15 +22,22 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   const [renderedDescriptionHtml, setRenderedDescriptionHtml] =
     useState<string>("");
 
+  // Update current pull request when data prop changes
+  useEffect(() => {
+    setCurrentPullRequest(data);
+  }, [data]);
+
   // No automatic clearing - only clear on explicit refresh
 
   useEffect(() => {
     if (!timeline) {
       // Request timeline data if not provided
-      onMessage("getTimeline", { pullRequestNumber: data.number });
+      onMessage("getTimeline", {
+        pullRequestNumber: currentPullRequest.number,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.number, timeline]); // Removed onMessage from dependencies to prevent infinite refreshing
+  }, [currentPullRequest.number, timeline]); // Removed onMessage from dependencies to prevent infinite refreshing
 
   useEffect(() => {
     // Listen for timeline updates
@@ -54,6 +63,12 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
       } else if (message.type === "markdownRendered") {
         // Rendered markdown received
         setRenderedDescriptionHtml(message.data);
+      } else if (
+        message.type === "reactionAdded" ||
+        message.type === "reactionRemoved"
+      ) {
+        // Reaction was added or removed, refresh the pull request data to get updated reactions
+        onMessage("refresh");
       }
     };
 
@@ -106,14 +121,14 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
   // Reaction handlers
   const handleAddPullRequestReaction = (reaction: string) => {
     onMessage("addPullRequestReaction", {
-      pullRequestNumber: data.number,
+      pullRequestNumber: currentPullRequest.number,
       reaction,
     });
   };
 
   const handleRemovePullRequestReaction = (reaction: string) => {
     onMessage("removePullRequestReaction", {
-      pullRequestNumber: data.number,
+      pullRequestNumber: currentPullRequest.number,
       reaction,
     });
   };
@@ -245,7 +260,7 @@ const PullRequestDetails: React.FC<Props> = ({ data, timeline, onMessage }) => {
           />
           <div className="mt-4">
             <ReactionPicker
-              reactions={data.reactions || []}
+              reactions={currentPullRequest.reactions || []}
               onAddReaction={handleAddPullRequestReaction}
               onRemoveReaction={handleRemovePullRequestReaction}
             />
